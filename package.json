@@ -1,0 +1,43 @@
+{
+  "name": "@creduent/sdk",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Client SDK for the AXI protocol - resolving, registering, and verifying AI agent identities.",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      },
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build:esm": "tsc",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build": "npm run build:esm && npm run build:cjs",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "creduent",
+    "agent",
+    "identity",
+    "cryptography",
+    "axi",
+    "verification"
+  ],
+  "author": "Creduent Protocol Group",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
