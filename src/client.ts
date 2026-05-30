@@ -107,7 +107,7 @@ export async function resolveAgent(uri: string, options?: ClientOptions): Promis
 export async function verifyAgent(uri: string, options?: ClientOptions): Promise<boolean> {
   try {
     const record = await resolveAgent(uri, options);
-    return record.level === "verified";
+    return record.level === "verified" || record.level === "trusted";
   } catch (error) {
     if (error instanceof AgentNotFoundError) {
       return false;

@@ -1,7 +1,7 @@
 export interface AgentRecord {
   agent_id: string;
   issuer: string;
-  level: "verified" | "unverified" | "revoked";
+  level: "verified" | "trusted" | "unverified" | "revoked";
   domain: string;
   public_key: string;
   registered_at: string;
