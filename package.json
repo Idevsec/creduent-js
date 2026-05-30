@@ -2,7 +2,7 @@
   "name": "@creduent/sdk",
   "version": "0.1.0",
   "type": "module",
-  "description": "Client SDK for the AXI protocol - resolving, registering, and verifying AI agent identities.",
+  "description": "Client SDK for the Creduent Protocol - resolving, registering, and verifying AI agent identities.",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/esm/index.d.ts",
@@ -32,7 +32,7 @@
     "agent",
     "identity",
     "cryptography",
-    "axi",
+    "creduent",
     "verification"
   ],
   "author": "Creduent Protocol Group",

@@ -58,7 +58,7 @@ async function request<T>(
   try {
     response = await fetch(url, fetchOptions);
   } catch (error: any) {
-    throw new CreduentError(`Failed to connect to the AXI registry: ${error.message}`);
+    throw new CreduentError(`Failed to connect to the Creduent Registry: ${error.message}`);
   }
 
   if (response.status === 404) {
@@ -68,7 +68,7 @@ async function request<T>(
   const text = await response.text();
   if (!response.ok) {
     throw new CreduentError(
-      `AXI Registry returned an unexpected error (${response.status} ${response.statusText}): ${text}`,
+      `Creduent Registry returned an unexpected error (${response.status} ${response.statusText}): ${text}`,
       response.status,
       text
     );
