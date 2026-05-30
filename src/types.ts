@@ -5,6 +5,8 @@ export interface AgentRecord {
   domain: string;
   public_key: string;
   registered_at: string;
+  issued_at: string;
+  expires_at: string;
 }
 
 export interface RegisterPayload {
