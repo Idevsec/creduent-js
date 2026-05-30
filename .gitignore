@@ -81,6 +81,8 @@ Thumbs.db
 .env.production.local
 .env.pulled
 .env.pulled.*
+*.pem
 
 # Vercel directory
 .vercel
+

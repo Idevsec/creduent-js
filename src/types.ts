@@ -10,9 +10,10 @@ export interface AgentRecord {
 export interface RegisterPayload {
   agent_id: string;
   domain: string;
-  public_key: string;
+  agent_json_url: string;
   metadata?: Record<string, string>;
 }
+
 
 export interface ClientOptions {
   baseUrl?: string;

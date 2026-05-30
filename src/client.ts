@@ -132,6 +132,7 @@ export async function registerAgent(payload: RegisterPayload, options?: ClientOp
     agent_id: normalizeAgentUri(payload.agent_id),
   };
 
-  const url = `${baseUrl}/attest`;
+  const url = `${baseUrl}/registry/register`;
   return request<AgentRecord>(url, "POST", normalizedPayload, options);
 }
+
