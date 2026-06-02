@@ -79,7 +79,7 @@ async function main() {
     const registration = await registerAgent({
       agent_id: "agent://creduent/my-new-bot",
       domain: "example.com",
-      public_key: "ed25519:hArTvbITJ2jirL170IOSjcVvEvstC4s+RjYLu4chCwg=",
+      agent_json_url: "https://example.com/.well-known/agent.json",
       metadata: {
         description: "A custom testing assistant"
       }
@@ -144,7 +144,7 @@ Registers an AI agent's identity with the Creduent registry.
   - `payload` (`RegisterPayload`): Staged verification information.
     - `agent_id` (`string`): The canonical `agent://` URI.
     - `domain` (`string`): The target domain.
-    - `public_key` (`string`): The public key string formatted as `ed25519:<key>`.
+    - `agent_json_url` (`string`): The URL where the agent's `agent.json` metadata is hosted.
     - `metadata` (`Record<string, string>`, optional): Extra metadata fields.
   - `options` (`ClientOptions`, optional): Configuration options.
 - **Returns**: `Promise<AgentRecord>`
