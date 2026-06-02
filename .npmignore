@@ -1,0 +1,20 @@
+# Ignore source code and TypeScript configs in the published package
+src/
+tsconfig.json
+tsconfig.cjs.json
+.vscode/
+.idea/
+
+# Ignore local config files
+.env
+.env.local
+.env.*
+
+# Ignore logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Ignore OS metadata
+.DS_Store
+Thumbs.db

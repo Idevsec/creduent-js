@@ -1,5 +1,5 @@
 {
-  "name": "@creduent/sdk",
+  "name": "@idevsec/creduent",
   "version": "0.1.0",
   "type": "module",
   "description": "Client SDK for the Creduent Protocol - resolving, registering, and verifying AI agent identities.",
@@ -32,12 +32,17 @@
     "agent",
     "identity",
     "cryptography",
-    "creduent",
-    "verification"
+    "verification",
+    "idevsec"
   ],
-  "author": "Creduent Protocol Group",
-  "license": "MIT",
+  "author": "IDevSec",
+  "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
     "typescript": "^5.3.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/idevsec/creduent-js"
+  },
+  "homepage": "https://github.com/idevsec/creduent-js#readme"
 }

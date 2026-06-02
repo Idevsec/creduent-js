@@ -1,9 +1,9 @@
 # Creduent JS/TS SDK
 
-[![npm version](https://img.shields.io/npm/v/@creduent/sdk.svg?color=blue)](https://www.npmjs.com/package/@creduent/sdk)
-[![License](https://img.shields.io/github/license/creduent/creduent-js.svg)](https://github.com/creduent/creduent-js/blob/main/LICENSE)
-[![Node Compatibility](https://img.shields.io/node/v/@creduent/sdk.svg)](https://nodejs.org/)
-[![Downloads](https://img.shields.io/npm/dm/@creduent/sdk.svg)](https://www.npmjs.com/package/@creduent/sdk)
+[![npm version](https://img.shields.io/npm/v/@idevsec/creduent.svg?color=blue)](https://www.npmjs.com/package/@idevsec/creduent)
+[![License](https://img.shields.io/github/license/idevsec/creduent-js.svg)](https://github.com/idevsec/creduent-js/blob/main/LICENSE)
+[![Node Compatibility](https://img.shields.io/node/v/@idevsec/creduent.svg)](https://nodejs.org/)
+[![Downloads](https://img.shields.io/npm/dm/@idevsec/creduent.svg)](https://www.npmjs.com/package/@idevsec/creduent)
 
 The official JavaScript/TypeScript client SDK for the **Creduent Protocol** — a federated, open trust-verification layer and cryptographic identity infrastructure for autonomous AI agents.
 
@@ -44,7 +44,7 @@ Creduent enables autonomous agents to resolve attestation records, verify identi
 Install the package via npm, yarn, or pnpm:
 
 ```bash
-npm install @creduent/sdk
+npm install @idevsec/creduent
 ```
 
 ---
@@ -56,7 +56,7 @@ Here is how to resolve an agent's attestation record, verify their status, and r
 ### ESM / TypeScript (`import`)
 
 ```typescript
-import { resolveAgent, verifyAgent, registerAgent, AgentNotFoundError, CreduentError } from "@creduent/sdk";
+import { resolveAgent, verifyAgent, registerAgent, AgentNotFoundError, CreduentError } from "@idevsec/creduent";
 
 async function main() {
   try {
@@ -103,7 +103,7 @@ main();
 ### CommonJS (`require`)
 
 ```javascript
-const { resolveAgent, verifyAgent } = require("@creduent/sdk");
+const { resolveAgent, verifyAgent } = require("@idevsec/creduent");
 
 async function main() {
   const isVerified = await verifyAgent("agent://creduent/reconbot");
@@ -169,8 +169,8 @@ const customRecord = await resolveAgent("agent://creduent/reconbot", {
 
 ## Protocol Specification
 
-For full information on the cryptographic standards, JCS canonicalization, and the federated verification workflows, read the complete [Creduent Protocol Specification](https://github.com/creduent/creduent).
+For full information on the cryptographic standards, JCS canonicalization, and the federated verification workflows, read the complete [Creduent Protocol Specification](https://github.com/idevsec/creduent).
 
 ## License
 
-This SDK is licensed under the [MIT License](LICENSE).
+This SDK is licensed under a Dual License model (Apache 2.0 or Commercial). See [LICENSE](LICENSE) for details.
