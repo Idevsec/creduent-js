@@ -86,3 +86,8 @@ Thumbs.db
 # Vercel directory
 .vercel
 
+# Claude / Agent rules
+CLAUDE.md
+AGENTS.md
+
+
