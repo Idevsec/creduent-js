@@ -1,6 +1,6 @@
 import { AgentRecord, RegisterPayload, ClientOptions } from "./types.js";
 
-const DEFAULT_BASE_URL = "https://api.idevsec.com";
+const DEFAULT_BASE_URL = "https://registry.idevsec.com";
 
 export class CreduentError extends Error {
   constructor(message: string, public statusCode?: number, public responseText?: string) {
@@ -92,7 +92,7 @@ export async function resolveAgent(uri: string, options?: ClientOptions): Promis
   const baseUrl = options?.baseUrl?.replace(/\/$/, "") || DEFAULT_BASE_URL;
   const normalizedUri = normalizeAgentUri(uri);
   
-  // Construct the URL: e.g. https://api.idevsec.com/agent://creduent/reconbot
+  // Construct the URL: e.g. https://registry.idevsec.com/agent://creduent/reconbot
   const url = `${baseUrl}/${normalizedUri}`;
   return request<AgentRecord>(url, "GET", undefined, options);
 }

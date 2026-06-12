@@ -157,7 +157,7 @@ You can customize the client operations by passing an optional `options` paramet
 
 ```typescript
 const customRecord = await resolveAgent("agent://creduent/reconbot", {
-  baseUrl: "https://custom-registry.internal.net", // Override public registry domain (defaults to https://api.idevsec.com)
+  baseUrl: "https://custom-registry.internal.net", // Override public registry domain (defaults to https://registry.idevsec.com)
   headers: {
     "Authorization": "Bearer token_123",            // Set custom authentication/authorization headers
     "X-Custom-Header": "custom-value"
