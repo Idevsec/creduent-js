@@ -5,18 +5,20 @@
 [![Node Compatibility](https://img.shields.io/node/v/@idevsec/creduent.svg)](https://nodejs.org/)
 [![Downloads](https://img.shields.io/npm/dm/@idevsec/creduent.svg)](https://www.npmjs.com/package/@idevsec/creduent)
 
-The official JavaScript/TypeScript client SDK for the **Creduent Protocol** — a federated, open trust-verification layer and cryptographic identity infrastructure for autonomous AI agents.
+The official JavaScript/TypeScript client SDK for the **[Creduent Protocol](https://idevsec.com/creduent)** — the open standard for cryptographic AI agent identity, Ed25519 signing, DNS ownership verification, and attestation registry integration.
 
 Creduent enables autonomous agents to resolve attestation records, verify identities, and register with the Creduent registry for secure, machine-to-machine trust checks.
+
+> **Protocol**: [idevsec.com/creduent](https://idevsec.com/creduent) | **Docs**: [idevsec.com/creduent/docs](https://idevsec.com/creduent/docs) | **Registry**: [registry.idevsec.com](https://registry.idevsec.com)
 
 ---
 
 ## Key Features
 
-- 📦 **Zero Runtime Dependencies**: Extremely lightweight client library that works out-of-the-box.
-- 🌐 **Native Fetch Support**: Utilizes the modern native `fetch()` API, compatible with Node.js 18+, Edge environments, and modern web browsers.
-- 🏛️ **Registry Integration**: Seamless interaction with the Creduent Registry to register agents, resolve identity records, and verify active status.
-- ⚙️ **Dual CJS & ESM Support**: Ships with full ESM and CommonJS exports alongside built-in TypeScript declarations.
+- **Zero Runtime Dependencies**: Extremely lightweight client library that works out-of-the-box.
+- **Native Fetch Support**: Utilizes the modern native `fetch()` API, compatible with Node.js 18+, Edge environments, and modern web browsers.
+- **Registry Integration**: Seamless interaction with the Creduent Registry to register agents, resolve identity records, and verify active status.
+- **Dual CJS & ESM Support**: Ships with full ESM and CommonJS exports alongside built-in TypeScript declarations.
 
 ---
 
@@ -169,8 +171,12 @@ const customRecord = await resolveAgent("agent://creduent/reconbot", {
 
 ## Protocol Specification
 
-For full information on the cryptographic standards, JCS canonicalization, and the federated verification workflows, read the complete [Creduent Protocol Specification](https://github.com/idevsec/creduent).
+For full information on the cryptographic standards, JCS canonicalization, and the federated verification workflows:
+
+- **Protocol overview**: [idevsec.com/creduent](https://idevsec.com/creduent)
+- **Technical reference**: [idevsec.com/creduent/docs](https://idevsec.com/creduent/docs)
+- **Standards documents**: [github.com/idevsec/creduent](https://github.com/idevsec/creduent) (CREDUENT-001 through CREDUENT-005)
 
 ## License
 
-This SDK is licensed under a Dual License model (Apache 2.0 or Commercial). See [LICENSE](LICENSE) for details.
+This SDK is dual-licensed: Apache 2.0 for open-source and non-commercial use. Commercial license required for organizations with annual revenue exceeding USD $1,000,000. See [idevsec.com/creduent/licensing](https://idevsec.com/creduent/licensing) for full details.
