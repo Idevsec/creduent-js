@@ -5,9 +5,9 @@
 [![Node Compatibility](https://img.shields.io/node/v/@idevsec/creduent.svg)](https://nodejs.org/)
 [![Downloads](https://img.shields.io/npm/dm/@idevsec/creduent.svg)](https://www.npmjs.com/package/@idevsec/creduent)
 
-The official JavaScript/TypeScript client SDK for the **[Creduent Protocol](https://idevsec.com/creduent)** — the open standard for cryptographic AI agent identity, Ed25519 signing, DNS ownership verification, and attestation registry integration.
+The official JavaScript/TypeScript SDK for the **[Creduent Protocol](https://idevsec.com/creduent)** — the open standard for cryptographic AI agent identity, Ed25519 signing, and attestation.
 
-Creduent enables autonomous agents to resolve attestation records, verify identities, and register with the Creduent registry for secure, machine-to-machine trust checks.
+Performs fully **decentralized, local Ed25519 signature verification** using the Web Crypto API (`globalThis.crypto.subtle`). Zero runtime dependencies — works natively on Node.js 18+, Vercel Edge, Cloudflare Workers, Deno, and modern browsers.
 
 > **Protocol**: [idevsec.com/creduent](https://idevsec.com/creduent) | **Docs**: [idevsec.com/creduent/docs](https://idevsec.com/creduent/docs) | **Registry**: [registry.idevsec.com](https://registry.idevsec.com)
 
@@ -15,35 +15,15 @@ Creduent enables autonomous agents to resolve attestation records, verify identi
 
 ## Key Features
 
-- **Zero Runtime Dependencies**: Extremely lightweight client library that works out-of-the-box.
-- **Native Fetch Support**: Utilizes the modern native `fetch()` API, compatible with Node.js 18+, Edge environments, and modern web browsers.
-- **Registry Integration**: Seamless interaction with the Creduent Registry to register agents, resolve identity records, and verify active status.
+- **Zero Runtime Dependencies**: No third-party cryptography libraries. Uses only the built-in Web Crypto API.
+- **Edge-Compatible**: Runs anywhere `globalThis.crypto.subtle` is available — Vercel Edge, Cloudflare Workers, Deno, Node.js 18+.
+- **Decentralized Verification**: Validates Ed25519 signatures locally. No registry trust required for `verify()`.
+- **RFC 8785 JCS Canonicalization**: Native TypeScript implementation — deterministic JSON serialization before signing.
 - **Dual CJS & ESM Support**: Ships with full ESM and CommonJS exports alongside built-in TypeScript declarations.
 
 ---
 
-## Architectural Flow
-
-```
-+------------------+             +----------------------+             +------------------+
-|   Agent Domain   |             |   Creduent Registry  |             |   Agent Client   |
-|   (agent.json)   |             |                      |             |    (MCP Host)    |
-+------------------+             +----------------------+             +------------------+
-         |                                |                                |
-         |---- 1. Serve agent.json ------>|                                |
-         |                                |-- 2. Verify identity & DNS --->|
-         |                                |      and sign attestation      |
-         |                                |                                |
-         |<--- 3. Query agent endpoint ------------------------------------|  (verify_agent tool)
-         |                                |                                |
-         |                                |<--- 4. Fetch attestation ------|  (registry validation)
-```
-
----
-
 ## Installation
-
-Install the package via npm, yarn, or pnpm:
 
 ```bash
 npm install @idevsec/creduent
@@ -53,129 +33,218 @@ npm install @idevsec/creduent
 
 ## Quickstart
 
-Here is how to resolve an agent's attestation record, verify their status, and register a new agent.
+### Verify an Agent (Decentralized)
 
-### ESM / TypeScript (`import`)
+The primary use case — fetch an agent document and validate its Ed25519 signature locally:
 
 ```typescript
-import { resolveAgent, verifyAgent, registerAgent, AgentNotFoundError, CreduentError } from "@idevsec/creduent";
+import { verify } from "@idevsec/creduent";
 
-async function main() {
-  try {
-    // 1. Resolve an AI agent's attestation record
-    const agentUri = "agent://creduent/reconbot";
-    const record = await resolveAgent(agentUri);
-    
-    console.log("Agent ID:", record.agent_id);
-    console.log("Issuer namespace:", record.issuer);
-    console.log("Registered domain:", record.domain);
-    console.log("Attestation status level:", record.level); // "verified" | "unverified" | "revoked"
-    console.log("Public Key:", record.public_key);
-    console.log("Registered At:", record.registered_at);
-    
-    // 2. Check verification directly (returns true if level is "verified")
-    const isVerified = await verifyAgent(agentUri);
-    console.log(`Is verified: ${isVerified}`);
-    
-    // 3. Register a new agent with the Creduent registry
-    const registration = await registerAgent({
-      agent_id: "agent://creduent/my-new-bot",
-      domain: "example.com",
-      agent_json_url: "https://example.com/.well-known/agent.json",
-      metadata: {
-        description: "A custom testing assistant"
-      }
-    });
-    console.log("Registration successful for:", registration.agent_id);
+const result = await verify("agent://creduent/reconbot");
 
-  } catch (error) {
-    if (error instanceof AgentNotFoundError) {
-      console.error("Agent identity is not registered on the network.");
-    } else if (error instanceof CreduentError) {
-      console.error(`Registry error (${error.statusCode}):`, error.message);
-    } else {
-      console.error("Unexpected error:", error);
-    }
-  }
+if (result.valid) {
+  console.log("Agent ID:", result.agent_id);
+  console.log("Owner:", result.document?.owner);
+  console.log("Capabilities:", result.document?.capabilities);
+} else {
+  console.error("Verification failed:", result.reason);
 }
-
-main();
 ```
 
-### CommonJS (`require`)
+### Verify from a Raw Document
+
+If you already have the `agent.json` document in memory:
+
+```typescript
+import { verify } from "@idevsec/creduent";
+import type { AgentDocument } from "@idevsec/creduent";
+
+const doc: AgentDocument = { /* your agent.json object */ };
+const result = await verify(doc);
+
+console.log(result.valid); // true | false
+```
+
+### Resolve a Target
+
+Resolve an `agent://` URI, a domain, or a direct HTTPS URL to its `agent.json` document:
+
+```typescript
+import { resolveTarget } from "@idevsec/creduent";
+
+// Resolves via registry: https://registry.idevsec.com/attest/<uri>
+const doc = await resolveTarget("agent://creduent/reconbot");
+
+// Resolves via .well-known: https://example.com/.well-known/agent.json
+const doc2 = await resolveTarget("example.com");
+```
+
+### Register an Agent
+
+```typescript
+import { registerAgent } from "@idevsec/creduent";
+
+const record = await registerAgent({
+  agent_id: "agent://myorg/mybot",
+  domain: "myorg.com",
+  agent_json_url: "https://myorg.com/.well-known/agent.json",
+  metadata: { env: "production" }
+});
+
+console.log("Registered:", record.agent_id);
+```
+
+### CommonJS
 
 ```javascript
-const { resolveAgent, verifyAgent } = require("@idevsec/creduent");
+const { verify } = require("@idevsec/creduent");
 
-async function main() {
-  const isVerified = await verifyAgent("agent://creduent/reconbot");
-  console.log("Agent status is verified:", isVerified);
-}
-
-main().catch(console.error);
+verify("agent://creduent/reconbot").then(result => {
+  console.log(result.valid);
+}).catch(console.error);
 ```
+
+---
+
+## How Verification Works
+
+`verify()` performs a 4-step cryptographic check locally:
+
+1. **Resolve** — Fetches the `agent.json` document from the registry or `.well-known` endpoint.
+2. **Schema check** — Validates required fields (`version`, `agent_id`, `capabilities`, `signature`).
+3. **Canonicalize** — Removes the `signature` field and applies RFC 8785 JCS serialization.
+4. **Verify** — Validates the Ed25519 signature against all declared active public keys using `globalThis.crypto.subtle`.
+
+If any active key produces a valid signature, the result is `valid: true`. The registry does not need to be live for step 4 to succeed.
 
 ---
 
 ## API Reference
 
-### `resolveAgent(uri, options)`
-Resolves the complete attestation record for the given agent URI.
+### `verify(target)`
+
+Performs full cryptographic verification of an agent document.
 
 - **Parameters**:
-  - `uri` (`string`): The canonical `agent://<namespace>/<path>` URI.
-  - `options` (`ClientOptions`, optional): Configuration options.
-- **Returns**: `Promise<AgentRecord>`
+  - `target` (`string | AgentDocument`): An `agent://` URI, domain, HTTPS URL, or a pre-fetched document object.
+- **Returns**: `Promise<VerifyResult>`
 
 ---
 
-### `verifyAgent(uri, options)`
-Helper to quickly verify if an agent has a valid, active, and `"verified"` attestation status.
+### `resolveTarget(target)`
+
+Resolves a target string to an `AgentDocument` without verifying the signature.
+
+- **Parameters**:
+  - `target` (`string`): `agent://` URI, domain, or HTTPS URL.
+- **Returns**: `Promise<AgentDocument>`
+
+Set the `CREDUENT_REGISTRY_URL` environment variable to override the default registry (`https://registry.idevsec.com`).
+
+---
+
+### `resolveAgent(uri, options)`
+
+Resolves the complete registry attestation record for the given agent URI.
 
 - **Parameters**:
   - `uri` (`string`): The canonical `agent://` URI.
   - `options` (`ClientOptions`, optional): Configuration options.
-- **Returns**: `Promise<boolean>`
+- **Returns**: `Promise<AgentRecord>`
 
 ---
 
 ### `registerAgent(payload, options)`
+
 Registers an AI agent's identity with the Creduent registry.
 
 - **Parameters**:
-  - `payload` (`RegisterPayload`): Staged verification information.
-    - `agent_id` (`string`): The canonical `agent://` URI.
-    - `domain` (`string`): The target domain.
-    - `agent_json_url` (`string`): The URL where the agent's `agent.json` metadata is hosted.
-    - `metadata` (`Record<string, string>`, optional): Extra metadata fields.
+  - `payload` (`RegisterPayload`): `agent_id`, `domain`, `agent_json_url`, optional `metadata`.
   - `options` (`ClientOptions`, optional): Configuration options.
 - **Returns**: `Promise<AgentRecord>`
 
 ---
 
-## Configuration & Options (`ClientOptions`)
+### `canonicalize(obj)`
 
-You can customize the client operations by passing an optional `options` parameter to any function:
+Deterministic RFC 8785 JSON Canonicalization Scheme (JCS) serialization.
+
+- **Returns**: `string`
 
 ```typescript
-const customRecord = await resolveAgent("agent://creduent/reconbot", {
-  baseUrl: "https://custom-registry.internal.net", // Override public registry domain (defaults to https://registry.idevsec.com)
-  headers: {
-    "Authorization": "Bearer token_123",            // Set custom authentication/authorization headers
-    "X-Custom-Header": "custom-value"
-  }
-});
+import { canonicalize } from "@idevsec/creduent";
+
+const canonical = canonicalize({ b: 2, a: 1 });
+// => '{"a":1,"b":2}'
 ```
+
+---
+
+### `verifySignature(publicKey, signature, data)`
+
+Low-level Ed25519 signature verification using the Web Crypto API.
+
+```typescript
+import { verifySignature } from "@idevsec/creduent";
+
+const valid = await verifySignature(
+  "ed25519:V43yNaTrpqQj9YJnjYVL2HdOrqUDcnflhzNGuHTaFD8=",
+  "<base64-signature>",
+  "<canonical-json-string>"
+);
+```
+
+---
+
+## Types
+
+```typescript
+interface AgentDocument {
+  version: string;
+  agent_id: string;
+  owner?: string;
+  public_key?: string;
+  keys?: KeyRecord[];
+  endpoint?: string;
+  capabilities?: string[];
+  issued_at?: string;
+  signature?: string;
+  [key: string]: any;
+}
+
+interface KeyRecord {
+  public_key: string;
+  status: "active" | "revoked";
+  expires_at?: string;
+  revoked_at?: string;
+}
+
+interface VerifyResult {
+  valid: boolean;
+  agent_id?: string;
+  reason?: string;
+  document?: AgentDocument;
+}
+```
+
+---
+
+## Environment Variables
+
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `CREDUENT_REGISTRY_URL` | `https://registry.idevsec.com` | Override the registry used for `agent://` URI resolution. |
 
 ---
 
 ## Protocol Specification
 
-For full information on the cryptographic standards, JCS canonicalization, and the federated verification workflows:
-
 - **Protocol overview**: [idevsec.com/creduent](https://idevsec.com/creduent)
 - **Technical reference**: [idevsec.com/creduent/docs](https://idevsec.com/creduent/docs)
+- **CLI**: [github.com/idevsec/creduent-cli](https://github.com/idevsec/creduent-cli)
 - **Standards documents**: [github.com/idevsec/creduent](https://github.com/idevsec/creduent) (CREDUENT-001 through CREDUENT-005)
+
+---
 
 ## License
 
