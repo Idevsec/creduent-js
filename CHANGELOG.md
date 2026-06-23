@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Multisig Quorum Authorization Support**: Implemented threshold signature verification client support.
 - **Expiry Enforcements**: Synced verification pipeline to handle the shortened 30-day attestation windows.
 
+### Fixed
+- **HTTP 410 Revoked Response Handling**: Fixed `verifyAgent` to cleanly catch HTTP 410 (revoked) registry status codes and return `false` instead of throwing a raw `CreduentError` (preventing integrators from crashing).
+
 ## [0.1.3] - 2026-06-13
 
 ### Changed
