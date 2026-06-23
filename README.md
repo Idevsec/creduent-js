@@ -20,7 +20,7 @@ Performs fully **decentralized, local Ed25519 signature verification** using the
 - **Decentralized Verification**: Validates Ed25519 signatures locally. No registry trust required for `verify()`.
 - **RFC 8785 JCS Canonicalization**: Native TypeScript implementation — deterministic JSON serialization before signing.
 - **Dual CJS & ESM Support**: Ships with full ESM and CommonJS exports alongside built-in TypeScript declarations.
-- **Registry Operations (Sprint 4)**: Built-in support for webhook management, attestation renewals, and authenticated capability discovery.
+- **Registry Operations**: Built-in support for webhook management, attestation renewals, and authenticated capability discovery.
 - **Agent Framework Integrations**: First-class adapters for Vercel AI SDK and LangGraph JS.
 
 ---
