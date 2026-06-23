@@ -1,6 +1,6 @@
 {
   "name": "@idevsec/creduent",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "type": "module",
   "description": "Client SDK for the Creduent Protocol - resolving, registering, and verifying AI agent identities.",
   "main": "./dist/cjs/index.js",
