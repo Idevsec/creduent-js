@@ -20,6 +20,8 @@ Performs fully **decentralized, local Ed25519 signature verification** using the
 - **Decentralized Verification**: Validates Ed25519 signatures locally. No registry trust required for `verify()`.
 - **RFC 8785 JCS Canonicalization**: Native TypeScript implementation — deterministic JSON serialization before signing.
 - **Dual CJS & ESM Support**: Ships with full ESM and CommonJS exports alongside built-in TypeScript declarations.
+- **Registry Operations (Sprint 4)**: Built-in support for webhook management, attestation renewals, and authenticated capability discovery.
+- **Agent Framework Integrations**: First-class adapters for Vercel AI SDK and LangGraph JS.
 
 ---
 
@@ -104,6 +106,44 @@ verify("agent://creduent/reconbot").then(result => {
 }).catch(console.error);
 ```
 
+### Framework Integrations
+
+#### Vercel AI SDK
+Integrate agent verification as a tool within the Vercel AI SDK:
+
+```typescript
+import { creduentVerifyToolDefinition } from "@idevsec/creduent";
+import { tool } from "ai"; // Vercel AI SDK
+
+export const creduentVerifyTool = tool({
+  description: creduentVerifyToolDefinition.description,
+  parameters: creduentVerifyToolDefinition.parameters,
+  execute: creduentVerifyToolDefinition.execute,
+});
+```
+
+#### LangGraph JS
+Ensure agent-to-agent interactions are secure using the LangGraph node middleware:
+
+```typescript
+import { verifyAgentNode } from "@idevsec/creduent";
+import { StateGraph } from "@langchain/langgraph";
+
+interface State {
+  agentUri?: string;
+  verificationResult?: any;
+}
+
+const workflow = new StateGraph<State>({
+  channels: {
+    agentUri: null,
+    verificationResult: null
+  }
+})
+.addNode("verify", (state) => verifyAgentNode(state, { strict: true }))
+// Add other nodes and compile...
+```
+
 ---
 
 ## How Verification Works
@@ -162,6 +202,74 @@ Registers an AI agent's identity with the Creduent registry.
   - `payload` (`RegisterPayload`): `agent_id`, `domain`, `agent_json_url`, optional `metadata`.
   - `options` (`ClientOptions`, optional): Configuration options.
 - **Returns**: `Promise<AgentRecord>`
+
+---
+
+### `verifyAgent(uri, options)`
+
+Checks whether an agent's attestation status is active and valid (`verified` or `trusted`). Cleanly returns `false` on HTTP 404 and HTTP 410 (revoked) instead of throwing, allowing hosts to fail-closed gracefully.
+
+- **Parameters**:
+  - `uri` (`string`): The canonical `agent://` URI.
+  - `options` (`ClientOptions`, optional)
+- **Returns**: `Promise<boolean>`
+
+---
+
+### `renewAgent(payload, options)`
+
+Renews an agent's cryptographic registry attestation.
+
+- **Parameters**:
+  - `payload` (`RenewPayload`): Contains `agent_id`, `new_expires_at`, and signature.
+  - `options` (`ClientOptions`, optional)
+- **Returns**: `Promise<RenewResult>`
+
+---
+
+### `registerWebhook(payload, options)`
+
+Registers a webhook URL for status change notifications.
+
+- **Parameters**:
+  - `payload` (`WebhookPayload`): Contains `agent_id`, `webhook_url`, and signature.
+  - `options` (`ClientOptions`, optional)
+- **Returns**: `Promise<WebhookResult>`
+
+---
+
+### `queryWebhook(agentId, options)`
+
+Retrieves the currently registered webhook URL for the specified agent.
+
+- **Parameters**:
+  - `agentId` (`string`): The agent URI.
+  - `options` (`ClientOptions`, optional)
+- **Returns**: `Promise<WebhookResult>`
+
+---
+
+### `discoverAgent(targetUri, myAgentId, privateKeyPem, options)`
+
+Performs authenticated capability discovery by querying the target agent's `/discover` endpoint with challenge-response validation.
+
+- **Parameters**:
+  - `targetUri` (`string`): Target agent URI.
+  - `myAgentId` (`string`, optional): Your agent URI.
+  - `privateKeyPem` (`string`, optional): Your private key PEM.
+  - `options` (`ClientOptions`, optional)
+- **Returns**: `Promise<DiscoveryResult>`
+
+---
+
+### `signPayload(payload, privateKeyPem)`
+
+Utility to sign an arbitrary JSON payload using JCS canonicalization + Ed25519.
+
+- **Parameters**:
+  - `payload` (`any`): The payload to sign.
+  - `privateKeyPem` (`string`): Private key in PEM format.
+- **Returns**: `string` (Base64-encoded signature)
 
 ---
 
@@ -237,6 +345,54 @@ interface VerifyResult {
   agent_id?: string;
   reason?: string;
   document?: AgentDocument;
+}
+
+interface RegisterPayload {
+  agent_id: string;
+  domain: string;
+  agent_json_url: string;
+  metadata?: Record<string, string>;
+}
+
+interface ClientOptions {
+  baseUrl?: string;
+  headers?: Record<string, string>;
+}
+
+interface RenewPayload {
+  agent_id: string;
+  new_expires_at: string;
+  signature: string;
+}
+
+interface RenewResult {
+  agent_id: string;
+  issuer: string;
+  level: "verified" | "trusted" | "unverified" | "revoked";
+  domain: string;
+  public_key: string;
+  registered_at: string;
+  issued_at: string;
+  expires_at: string;
+}
+
+interface WebhookPayload {
+  agent_id: string;
+  webhook_url: string;
+  signature: string;
+}
+
+interface WebhookResult {
+  agent_id: string;
+  webhook_url: string;
+}
+
+interface DiscoveryResult {
+  target_agent_id: string;
+  endpoint?: string;
+  capabilities?: string[];
+  authenticated: boolean;
+  error?: string;
 }
 ```
 
