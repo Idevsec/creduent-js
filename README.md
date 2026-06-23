@@ -201,7 +201,7 @@ const valid = await verifySignature(
 ```typescript
 interface AgentDocument {
   version: string;
-  agent_id: string;
+  agent_id?: string;
   owner?: string;
   public_key?: string;
   keys?: KeyRecord[];
@@ -209,6 +209,19 @@ interface AgentDocument {
   capabilities?: string[];
   issued_at?: string;
   signature?: string;
+  
+  // v2.0 decoupled fields
+  identity?: {
+    agent_id: string;
+    owner: string;
+    keys: KeyRecord[];
+    endpoint: string;
+    delegated_from?: string;
+  };
+  policy?: {
+    capabilities: string[];
+  };
+  
   [key: string]: any;
 }
 

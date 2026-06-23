@@ -1,4 +1,15 @@
-import { AgentRecord, RegisterPayload, ClientOptions } from "./types.js";
+import {
+  AgentRecord,
+  RegisterPayload,
+  ClientOptions,
+  RenewPayload,
+  RenewResult,
+  WebhookPayload,
+  WebhookResult,
+  DiscoveryResult
+} from "./types.js";
+import { verify } from "./verify.js";
+import { signPayload } from "./sign.js";
 
 const DEFAULT_BASE_URL = "https://registry.idevsec.com";
 
@@ -112,9 +123,13 @@ export async function verifyAgent(uri: string, options?: ClientOptions): Promise
     if (error instanceof AgentNotFoundError) {
       return false;
     }
+    if (error instanceof CreduentError && error.statusCode === 410) {
+      return false;
+    }
     throw error;
   }
 }
+
 
 /**
  * Registers an AI agent with the Creduent Attestation Registry.
@@ -135,4 +150,158 @@ export async function registerAgent(payload: RegisterPayload, options?: ClientOp
   const url = `${baseUrl}/registry/register`;
   return request<AgentRecord>(url, "POST", normalizedPayload, options);
 }
+
+/**
+ * Renews an agent's cryptographic attestation.
+ */
+export async function renewAgent(payload: RenewPayload, options?: ClientOptions): Promise<RenewResult> {
+  const baseUrl = options?.baseUrl?.replace(/\/$/, "") || DEFAULT_BASE_URL;
+  
+  const normalizedPayload = {
+    ...payload,
+    agent_id: normalizeAgentUri(payload.agent_id),
+  };
+
+  const url = `${baseUrl}/registry/renew`;
+  return request<RenewResult>(url, "POST", normalizedPayload, options);
+}
+
+/**
+ * Registers a webhook URL for an agent.
+ */
+export async function registerWebhook(payload: WebhookPayload, options?: ClientOptions): Promise<WebhookResult> {
+  const baseUrl = options?.baseUrl?.replace(/\/$/, "") || DEFAULT_BASE_URL;
+  
+  const normalizedPayload = {
+    ...payload,
+    agent_id: normalizeAgentUri(payload.agent_id),
+  };
+
+  const url = `${baseUrl}/registry/webhook/register`;
+  return request<WebhookResult>(url, "POST", normalizedPayload, options);
+}
+
+/**
+ * Queries the webhook URL registered for an agent.
+ */
+export async function queryWebhook(agentId: string, options?: ClientOptions): Promise<WebhookResult> {
+  const baseUrl = options?.baseUrl?.replace(/\/$/, "") || DEFAULT_BASE_URL;
+  const normalizedAgentId = normalizeAgentUri(agentId);
+
+  const url = `${baseUrl}/registry/webhook/${encodeURIComponent(normalizedAgentId)}`;
+  return request<WebhookResult>(url, "GET", undefined, options);
+}
+
+/**
+ * Discovers an agent's capabilities.
+ * If myAgentId and privateKeyPem are provided, it signs a short-lived discovery token
+ * and requests private capabilities from the target agent's /discover endpoint.
+ */
+export async function discoverAgent(
+  targetUri: string,
+  myAgentId?: string,
+  privateKeyPem?: string,
+  options?: ClientOptions
+): Promise<DiscoveryResult> {
+  const targetNormalized = normalizeAgentUri(targetUri);
+  let verifyResult;
+  try {
+    verifyResult = await verify(targetNormalized);
+    if (!verifyResult.valid || !verifyResult.document) {
+      return {
+        target_agent_id: targetNormalized,
+        authenticated: false,
+        error: `Target agent verification failed: ${verifyResult.reason || "unknown reason"}`,
+      };
+    }
+  } catch (error: any) {
+    return {
+      target_agent_id: targetNormalized,
+      authenticated: false,
+      error: `Failed to fetch target agent identity: ${error.message}`,
+    };
+  }
+
+  const doc = verifyResult.document;
+  const endpoint = doc.endpoint;
+  const publicCaps = doc.capabilities || [];
+
+  if (!endpoint || !myAgentId || !privateKeyPem) {
+    return {
+      target_agent_id: doc.agent_id || targetNormalized,
+      endpoint,
+      capabilities: publicCaps,
+      authenticated: false,
+    };
+  }
+
+  const payload = {
+    iss: normalizeAgentUri(myAgentId),
+    aud: doc.agent_id,
+    exp: Math.floor(Date.now() / 1000) + 60,
+    action: "discover",
+  };
+
+  let signature;
+  try {
+    signature = signPayload(payload, privateKeyPem);
+  } catch (error: any) {
+    return {
+      target_agent_id: doc.agent_id || targetNormalized,
+      endpoint,
+      capabilities: publicCaps,
+      authenticated: false,
+      error: `Failed to sign discovery request: ${error.message}`,
+    };
+  }
+
+  const discoverUrl = endpoint.replace(/\/$/, "") + "/discover";
+  try {
+    const res = await fetch(discoverUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...payload,
+        signature,
+      }),
+    });
+
+    if (res.status === 200) {
+      const data = await res.json();
+      const privateCaps = data.capabilities || [];
+      const merged = [...publicCaps];
+      for (const cap of privateCaps) {
+        if (!merged.includes(cap)) {
+          merged.push(cap);
+        }
+      }
+      return {
+        target_agent_id: doc.agent_id || targetNormalized,
+        endpoint,
+        capabilities: merged,
+        authenticated: true,
+      };
+    } else {
+      const errText = await res.text();
+      return {
+        target_agent_id: doc.agent_id || targetNormalized,
+        endpoint,
+        capabilities: publicCaps,
+        authenticated: false,
+        error: `Authenticated discovery failed with HTTP ${res.status}: ${errText}`,
+      };
+    }
+  } catch (error: any) {
+    return {
+      target_agent_id: doc.agent_id || targetNormalized,
+      endpoint,
+      capabilities: publicCaps,
+      authenticated: false,
+      error: `Network error during authenticated discovery: ${error.message}`,
+    };
+  }
+}
+
 

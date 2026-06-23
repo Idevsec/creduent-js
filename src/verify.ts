@@ -45,8 +45,19 @@ export async function verify(target: string | AgentDocument): Promise<VerifyResu
     return { valid: false, reason: error.message || "Resolution failed" };
   }
 
-  if (!doc.version || !doc.agent_id || !doc.capabilities) {
-    return { valid: false, reason: "Invalid schema", document: doc };
+  if (doc.version === "2.0") {
+    if (!doc.identity || !doc.policy) {
+      return { valid: false, reason: "v2.0 agent document must contain identity and policy objects", document: doc };
+    }
+    const identity = doc.identity;
+    const policy = doc.policy;
+    if (!identity.agent_id || !identity.keys || !identity.endpoint || !policy.capabilities) {
+      return { valid: false, reason: "Invalid schema (missing required v2.0 fields)", document: doc };
+    }
+  } else {
+    if (!doc.version || !doc.agent_id || !doc.capabilities) {
+      return { valid: false, reason: "Invalid schema", document: doc };
+    }
   }
 
   const signature = doc.signature;
@@ -56,10 +67,19 @@ export async function verify(target: string | AgentDocument): Promise<VerifyResu
 
   // Collect all active public keys
   const keys: string[] = [];
-  if (doc.public_key) keys.push(doc.public_key);
-  if (Array.isArray(doc.keys)) {
-    for (const keyRec of doc.keys as KeyRecord[]) {
-      if (keyRec.status === "active") keys.push(keyRec.public_key);
+  if (doc.version === "2.0") {
+    const identityKeys = doc.identity?.keys;
+    if (Array.isArray(identityKeys)) {
+      for (const keyRec of identityKeys) {
+        if (keyRec.status === "active") keys.push(keyRec.public_key);
+      }
+    }
+  } else {
+    if (doc.public_key) keys.push(doc.public_key);
+    if (Array.isArray(doc.keys)) {
+      for (const keyRec of doc.keys as KeyRecord[]) {
+        if (keyRec.status === "active") keys.push(keyRec.public_key);
+      }
     }
   }
 
@@ -75,7 +95,7 @@ export async function verify(target: string | AgentDocument): Promise<VerifyResu
   for (const key of keys) {
     const isValid = await verifySignature(key, signature, canonicalData);
     if (isValid) {
-      return { valid: true, agent_id: doc.agent_id, document: doc };
+      return { valid: true, agent_id: doc.version === "2.0" ? doc.identity?.agent_id : doc.agent_id, document: doc };
     }
   }
 

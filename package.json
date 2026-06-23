@@ -38,7 +38,11 @@
   "author": "IDevSec",
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
+    "@types/node": "^26.0.0",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
   },
   "repository": {
     "type": "git",
