@@ -13,7 +13,30 @@ export async function resolveTarget(target: string): Promise<AgentDocument> {
     // @ts-ignore
     const envUrl = typeof process !== "undefined" && process.env ? process.env.CREDUENT_REGISTRY_URL : undefined;
     const registryUrl = envUrl || DEFAULT_REGISTRY_URL;
-    url = `${registryUrl}/attest/${encodeURIComponent(target)}`;
+    const attestUrl = `${registryUrl}/attest/${encodeURIComponent(target)}`;
+    
+    try {
+      const res = await fetch(attestUrl);
+      if (res.ok) {
+        const attestation = await res.json();
+        const domain = attestation.domain;
+        if (domain) {
+          const scheme = (domain.includes("localhost") || domain.includes("127.0.0.1")) ? "http" : "https";
+          url = `${scheme}://${domain}/.well-known/agent.json`;
+          
+          const finalRes = await fetch(url);
+          if (finalRes.ok) {
+            return (await finalRes.json()) as AgentDocument;
+          }
+        }
+      }
+    } catch (e) {
+      // Fallback
+    }
+    
+    // Fallback to default namespace resolution
+    const namespace = target.substring(8).split("/")[0];
+    url = `https://api.${namespace}.ai/.well-known/agent.json`;
   } else if (!target.startsWith("http")) {
     url = `https://${target}/.well-known/agent.json`;
   }
