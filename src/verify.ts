@@ -1,7 +1,7 @@
 import { AgentDocument, VerifyResult, KeyRecord } from "./types.js";
 import { canonicalize, verifySignature } from "./crypto.js";
 
-const DEFAULT_REGISTRY_URL = "https://registry.idevsec.com";
+const DEFAULT_REGISTRY_URL = "https://creduent.idevsec.com";
 
 /**
  * Resolves an agent:// URI, http(s) URL, or domain to a well-known agent.json

@@ -9,7 +9,7 @@ The official JavaScript/TypeScript SDK for the **[Creduent Protocol](https://ide
 
 Performs fully **decentralized, local Ed25519 signature verification** using the Web Crypto API (`globalThis.crypto.subtle`). Zero runtime dependencies — works natively on Node.js 18+, Vercel Edge, Cloudflare Workers, Deno, and modern browsers.
 
-> **Protocol**: [idevsec.com/creduent](https://idevsec.com/creduent) | **Docs**: [idevsec.com/creduent/docs](https://idevsec.com/creduent/docs) | **Registry**: [registry.idevsec.com](https://registry.idevsec.com)
+> **Protocol**: [idevsec.com/creduent](https://idevsec.com/creduent) | **Docs**: [idevsec.com/creduent/docs](https://idevsec.com/creduent/docs) | **Registry**: [creduent.idevsec.com](https://creduent.idevsec.com)
 
 ---
 
@@ -74,7 +74,7 @@ Resolve an `agent://` URI, a domain, or a direct HTTPS URL to its `agent.json` d
 ```typescript
 import { resolveTarget } from "@idevsec/creduent";
 
-// Resolves via registry: https://registry.idevsec.com/attest/<uri>
+// Resolves via registry: https://creduent.idevsec.com/attest/<uri>
 const doc = await resolveTarget("agent://creduent/reconbot");
 
 // Resolves via .well-known: https://example.com/.well-known/agent.json
@@ -179,7 +179,7 @@ Resolves a target string to an `AgentDocument` without verifying the signature.
   - `target` (`string`): `agent://` URI, domain, or HTTPS URL.
 - **Returns**: `Promise<AgentDocument>`
 
-Set the `CREDUENT_REGISTRY_URL` environment variable to override the default registry (`https://registry.idevsec.com`).
+Set the `CREDUENT_REGISTRY_URL` environment variable to override the default registry (`https://creduent.idevsec.com`).
 
 ---
 
@@ -402,7 +402,7 @@ interface DiscoveryResult {
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
-| `CREDUENT_REGISTRY_URL` | `https://registry.idevsec.com` | Override the registry used for `agent://` URI resolution. |
+| `CREDUENT_REGISTRY_URL` | `https://creduent.idevsec.com` | Override the registry used for `agent://` URI resolution. |
 
 ---
 
@@ -417,4 +417,4 @@ interface DiscoveryResult {
 
 ## License
 
-This SDK is dual-licensed: Apache 2.0 for open-source and non-commercial use. Commercial license required for organizations with annual revenue exceeding USD $1,000,000. See [idevsec.com/creduent/licensing](https://idevsec.com/creduent/licensing) for full details.
+Licensed under the **[Apache License 2.0](LICENSE)**. See the [LICENSE](LICENSE) file for the full legal text.
