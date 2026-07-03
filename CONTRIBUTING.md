@@ -7,36 +7,40 @@ Thank you for your interest in contributing to the Creduent JS/TS SDK! This guid
 ## Development Setup
 
 1. **Clone the Repository:**
-   ```bash
-   git clone https://github.com/idevsec/creduent-js.git
-   cd creduent-js
-   ```
+
+    ```bash
+    git clone https://github.com/idevsec/creduent-js.git
+    cd creduent-js
+    ```
 
 2. **Install Dependencies:**
-   ```bash
-   npm install
-   ```
+
+    ```bash
+    npm install
+    ```
 
 3. **Build the SDK:**
    Compiles ESM/CommonJS targets and generates TypeScript declaration files:
-   ```bash
-   npm run build
-   ```
+
+    ```bash
+    npm run build
+    ```
 
 4. **Run the Test Suite:**
    Verify your setup by running the unit tests:
-   ```bash
-   npm run test
-   ```
+    ```bash
+    npm run test
+    ```
 
 ---
 
 ## Code Guidelines & Robustness Guarantees
 
 Please ensure all contributions respect the SDK's lightweight and zero-dependency philosophy:
-* **Zero Runtime Dependencies:** Do not add third-party NPM packages for runtime cryptographic operations or JCS formatting. Rely strictly on the standard built-in `globalThis.crypto.subtle` (Web Crypto API).
-* **Cross-Runtime Compatibility:** Ensure codebase changes run cleanly in Node.js 18+, Edge environments (Vercel Edge, Cloudflare Workers), Deno, and modern web browsers.
-* **Canonicalization:** Ensure all payloads conform to RFC 8785 JSON Canonicalization Scheme (JCS) before signing or verifying.
+
+- **Zero Runtime Dependencies:** Do not add third-party NPM packages for runtime cryptographic operations or JCS formatting. Rely strictly on the standard built-in `globalThis.crypto.subtle` (Web Crypto API).
+- **Cross-Runtime Compatibility:** Ensure codebase changes run cleanly in Node.js 18+, Edge environments (Vercel Edge, Cloudflare Workers), Deno, and modern web browsers.
+- **Canonicalization:** Ensure all payloads conform to RFC 8785 JSON Canonicalization Scheme (JCS) before signing or verifying.
 
 ---
 
@@ -46,10 +50,10 @@ To keep the repository clean and manageable, please follow our branching convent
 
 ### Branch Naming Conventions
 
-* **Features:** Use prefix `feature/` (e.g., `feature/vercel-ai-sdk-upgrade`) for new API methods or framework integrations.
-* **Bugfixes:** Use prefix `bugfix/` (e.g., `bugfix/edge-crypto-subtle-fix`) for fixing bugs or issues.
-* **Documentation:** Use prefix `docs/` (e.g., `docs/quickstart-guide-update`) for changes to documentation or README files.
-* **Refactoring:** Use prefix `refactor/` (e.g., `refactor/modular-verifiers`) for code refactors with no functional changes.
+- **Features:** Use prefix `feature/` (e.g., `feature/vercel-ai-sdk-upgrade`) for new API methods or framework integrations.
+- **Bugfixes:** Use prefix `bugfix/` (e.g., `bugfix/edge-crypto-subtle-fix`) for fixing bugs or issues.
+- **Documentation:** Use prefix `docs/` (e.g., `docs/quickstart-guide-update`) for changes to documentation or README files.
+- **Refactoring:** Use prefix `refactor/` (e.g., `refactor/modular-verifiers`) for code refactors with no functional changes.
 
 ### Pull Request Process
 

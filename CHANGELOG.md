@@ -8,43 +8,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.2] - 2026-06-27
 
 ### Changed
+
 - **Unified Domain Name Migration:** Standardized default registry URL on `creduent.idevsec.com` across all SDK methods, default arguments, and environment configurations.
 
 ## [2.0.1] - 2026-06-27
 
 ### Changed
+
 - **Single Licensing Alignment:** Transitioned package metadata to sole coverage under the Apache License 2.0.
 
 ## [2.0.0] - 2026-06-23
 
 ### Added
+
 - **v2.0 Schema Split Support**: Added dynamic parsing and version-gating for the v2.0 schema structure separating `identity`, `policy`, and `signature` blocks.
 - **DNS Recovery Override Endpoint Support**: Updated client resolver to support recovery overrides.
 - **Multisig Quorum Authorization Support**: Implemented threshold signature verification client support.
 - **Expiry Enforcements**: Synced verification pipeline to handle the shortened 30-day attestation windows.
 
 ### Fixed
+
 - **HTTP 410 Revoked Response Handling**: Fixed `verifyAgent` to cleanly catch HTTP 410 (revoked) registry status codes and return `false` instead of throwing a raw `CreduentError` (preventing integrators from crashing).
 
 ## [0.1.3] - 2026-06-13
 
 ### Changed
+
 - Migrated default registry URL from `api.idevsec.com` to `creduent.idevsec.com`.
 
 ## [0.1.2] - 2026-06-08
 
 ### Changed
+
 - Standardized git ignores.
 - Re-packaged distribution package.
 
 ## [0.1.1] - 2026-06-02
 
 ### Fixed
+
 - Fixed quickstart and API parameter documentation in `README.md` for `registerAgent`, replacing the incorrect `public_key` field with the required `agent_json_url`.
 
 ## [0.1.0] - 2026-06-02
 
 ### Added
+
 - Initial release: Core agent resolution (`resolveAgent`), status verification (`verifyAgent`), and registry registration (`registerAgent`) methods.
 - Built-in TypeScript type definitions.
 - CommonJS & ESM dual builds support.

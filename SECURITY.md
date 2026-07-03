@@ -18,8 +18,9 @@ Only the latest release of Creduent JS/TS SDK is actively supported with securit
 ## Security Guarantees & Verification Integrity
 
 Creduent JS/TS SDK implements strict safety and cryptographic validation measures:
-*   **Decentralized, Local Verification:** Signature verification does not rely on third-party remote calls to confirm validity. Ed25519 signature checks are performed locally inside the runtime context.
-*   **Zero-Dependency Scope:** Minimal dependency surface area reduces vulnerability risks due to supply-chain attacks.
+
+- **Decentralized, Local Verification:** Signature verification does not rely on third-party remote calls to confirm validity. Ed25519 signature checks are performed locally inside the runtime context.
+- **Zero-Dependency Scope:** Minimal dependency surface area reduces vulnerability risks due to supply-chain attacks.
 
 ---
 

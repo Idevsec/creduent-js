@@ -45,11 +45,11 @@ import { verify } from "@idevsec/creduent";
 const result = await verify("agent://creduent/reconbot");
 
 if (result.valid) {
-  console.log("Agent ID:", result.agent_id);
-  console.log("Owner:", result.document?.owner);
-  console.log("Capabilities:", result.document?.capabilities);
+    console.log("Agent ID:", result.agent_id);
+    console.log("Owner:", result.document?.owner);
+    console.log("Capabilities:", result.document?.capabilities);
 } else {
-  console.error("Verification failed:", result.reason);
+    console.error("Verification failed:", result.reason);
 }
 ```
 
@@ -61,7 +61,7 @@ If you already have the `agent.json` document in memory:
 import { verify } from "@idevsec/creduent";
 import type { AgentDocument } from "@idevsec/creduent";
 
-const doc: AgentDocument = { /* your agent.json object */ };
+const doc: AgentDocument = {/* your agent.json object */};
 const result = await verify(doc);
 
 console.log(result.valid); // true | false
@@ -87,10 +87,10 @@ const doc2 = await resolveTarget("example.com");
 import { registerAgent } from "@idevsec/creduent";
 
 const record = await registerAgent({
-  agent_id: "agent://myorg/mybot",
-  domain: "myorg.com",
-  agent_json_url: "https://myorg.com/.well-known/agent.json",
-  metadata: { env: "production" }
+    agent_id: "agent://myorg/mybot",
+    domain: "myorg.com",
+    agent_json_url: "https://myorg.com/.well-known/agent.json",
+    metadata: { env: "production" },
 });
 
 console.log("Registered:", record.agent_id);
@@ -101,14 +101,17 @@ console.log("Registered:", record.agent_id);
 ```javascript
 const { verify } = require("@idevsec/creduent");
 
-verify("agent://creduent/reconbot").then(result => {
-  console.log(result.valid);
-}).catch(console.error);
+verify("agent://creduent/reconbot")
+    .then((result) => {
+        console.log(result.valid);
+    })
+    .catch(console.error);
 ```
 
 ### Framework Integrations
 
 #### Vercel AI SDK
+
 Integrate agent verification as a tool within the Vercel AI SDK:
 
 ```typescript
@@ -116,13 +119,14 @@ import { creduentVerifyToolDefinition } from "@idevsec/creduent";
 import { tool } from "ai"; // Vercel AI SDK
 
 export const creduentVerifyTool = tool({
-  description: creduentVerifyToolDefinition.description,
-  parameters: creduentVerifyToolDefinition.parameters,
-  execute: creduentVerifyToolDefinition.execute,
+    description: creduentVerifyToolDefinition.description,
+    parameters: creduentVerifyToolDefinition.parameters,
+    execute: creduentVerifyToolDefinition.execute,
 });
 ```
 
 #### LangGraph JS
+
 Ensure agent-to-agent interactions are secure using the LangGraph node middleware:
 
 ```typescript
@@ -130,17 +134,16 @@ import { verifyAgentNode } from "@idevsec/creduent";
 import { StateGraph } from "@langchain/langgraph";
 
 interface State {
-  agentUri?: string;
-  verificationResult?: any;
+    agentUri?: string;
+    verificationResult?: any;
 }
 
 const workflow = new StateGraph<State>({
-  channels: {
-    agentUri: null,
-    verificationResult: null
-  }
-})
-.addNode("verify", (state) => verifyAgentNode(state, { strict: true }))
+    channels: {
+        agentUri: null,
+        verificationResult: null,
+    },
+}).addNode("verify", (state) => verifyAgentNode(state, { strict: true }));
 // Add other nodes and compile...
 ```
 
@@ -166,7 +169,7 @@ If any active key produces a valid signature, the result is `valid: true`. The r
 Performs full cryptographic verification of an agent document.
 
 - **Parameters**:
-  - `target` (`string | AgentDocument`): An `agent://` URI, domain, HTTPS URL, or a pre-fetched document object.
+    - `target` (`string | AgentDocument`): An `agent://` URI, domain, HTTPS URL, or a pre-fetched document object.
 - **Returns**: `Promise<VerifyResult>`
 
 ---
@@ -176,7 +179,7 @@ Performs full cryptographic verification of an agent document.
 Resolves a target string to an `AgentDocument` without verifying the signature.
 
 - **Parameters**:
-  - `target` (`string`): `agent://` URI, domain, or HTTPS URL.
+    - `target` (`string`): `agent://` URI, domain, or HTTPS URL.
 - **Returns**: `Promise<AgentDocument>`
 
 Set the `CREDUENT_REGISTRY_URL` environment variable to override the default registry (`https://creduent.idevsec.com`).
@@ -188,8 +191,8 @@ Set the `CREDUENT_REGISTRY_URL` environment variable to override the default reg
 Resolves the complete registry attestation record for the given agent URI.
 
 - **Parameters**:
-  - `uri` (`string`): The canonical `agent://` URI.
-  - `options` (`ClientOptions`, optional): Configuration options.
+    - `uri` (`string`): The canonical `agent://` URI.
+    - `options` (`ClientOptions`, optional): Configuration options.
 - **Returns**: `Promise<AgentRecord>`
 
 ---
@@ -199,8 +202,8 @@ Resolves the complete registry attestation record for the given agent URI.
 Registers an AI agent's identity with the Creduent registry.
 
 - **Parameters**:
-  - `payload` (`RegisterPayload`): `agent_id`, `domain`, `agent_json_url`, optional `metadata`.
-  - `options` (`ClientOptions`, optional): Configuration options.
+    - `payload` (`RegisterPayload`): `agent_id`, `domain`, `agent_json_url`, optional `metadata`.
+    - `options` (`ClientOptions`, optional): Configuration options.
 - **Returns**: `Promise<AgentRecord>`
 
 ---
@@ -210,8 +213,8 @@ Registers an AI agent's identity with the Creduent registry.
 Checks whether an agent's attestation status is active and valid (`verified` or `trusted`). Cleanly returns `false` on HTTP 404 and HTTP 410 (revoked) instead of throwing, allowing hosts to fail-closed gracefully.
 
 - **Parameters**:
-  - `uri` (`string`): The canonical `agent://` URI.
-  - `options` (`ClientOptions`, optional)
+    - `uri` (`string`): The canonical `agent://` URI.
+    - `options` (`ClientOptions`, optional)
 - **Returns**: `Promise<boolean>`
 
 ---
@@ -221,8 +224,8 @@ Checks whether an agent's attestation status is active and valid (`verified` or 
 Renews an agent's cryptographic registry attestation.
 
 - **Parameters**:
-  - `payload` (`RenewPayload`): Contains `agent_id`, `new_expires_at`, and signature.
-  - `options` (`ClientOptions`, optional)
+    - `payload` (`RenewPayload`): Contains `agent_id`, `new_expires_at`, and signature.
+    - `options` (`ClientOptions`, optional)
 - **Returns**: `Promise<RenewResult>`
 
 ---
@@ -232,8 +235,8 @@ Renews an agent's cryptographic registry attestation.
 Registers a webhook URL for status change notifications.
 
 - **Parameters**:
-  - `payload` (`WebhookPayload`): Contains `agent_id`, `webhook_url`, and signature.
-  - `options` (`ClientOptions`, optional)
+    - `payload` (`WebhookPayload`): Contains `agent_id`, `webhook_url`, and signature.
+    - `options` (`ClientOptions`, optional)
 - **Returns**: `Promise<WebhookResult>`
 
 ---
@@ -243,8 +246,8 @@ Registers a webhook URL for status change notifications.
 Retrieves the currently registered webhook URL for the specified agent.
 
 - **Parameters**:
-  - `agentId` (`string`): The agent URI.
-  - `options` (`ClientOptions`, optional)
+    - `agentId` (`string`): The agent URI.
+    - `options` (`ClientOptions`, optional)
 - **Returns**: `Promise<WebhookResult>`
 
 ---
@@ -254,10 +257,10 @@ Retrieves the currently registered webhook URL for the specified agent.
 Performs authenticated capability discovery by querying the target agent's `/discover` endpoint with challenge-response validation.
 
 - **Parameters**:
-  - `targetUri` (`string`): Target agent URI.
-  - `myAgentId` (`string`, optional): Your agent URI.
-  - `privateKeyPem` (`string`, optional): Your private key PEM.
-  - `options` (`ClientOptions`, optional)
+    - `targetUri` (`string`): Target agent URI.
+    - `myAgentId` (`string`, optional): Your agent URI.
+    - `privateKeyPem` (`string`, optional): Your private key PEM.
+    - `options` (`ClientOptions`, optional)
 - **Returns**: `Promise<DiscoveryResult>`
 
 ---
@@ -267,8 +270,8 @@ Performs authenticated capability discovery by querying the target agent's `/dis
 Utility to sign an arbitrary JSON payload using JCS canonicalization + Ed25519.
 
 - **Parameters**:
-  - `payload` (`any`): The payload to sign.
-  - `privateKeyPem` (`string`): Private key in PEM format.
+    - `payload` (`any`): The payload to sign.
+    - `privateKeyPem` (`string`): Private key in PEM format.
 - **Returns**: `string` (Base64-encoded signature)
 
 ---
@@ -296,9 +299,9 @@ Low-level Ed25519 signature verification using the Web Crypto API.
 import { verifySignature } from "@idevsec/creduent";
 
 const valid = await verifySignature(
-  "ed25519:V43yNaTrpqQj9YJnjYVL2HdOrqUDcnflhzNGuHTaFD8=",
-  "<base64-signature>",
-  "<canonical-json-string>"
+    "ed25519:V43yNaTrpqQj9YJnjYVL2HdOrqUDcnflhzNGuHTaFD8=",
+    "<base64-signature>",
+    "<canonical-json-string>"
 );
 ```
 
@@ -308,91 +311,91 @@ const valid = await verifySignature(
 
 ```typescript
 interface AgentDocument {
-  version: string;
-  agent_id?: string;
-  owner?: string;
-  public_key?: string;
-  keys?: KeyRecord[];
-  endpoint?: string;
-  capabilities?: string[];
-  issued_at?: string;
-  signature?: string;
-  
-  // v2.0 decoupled fields
-  identity?: {
-    agent_id: string;
-    owner: string;
-    keys: KeyRecord[];
-    endpoint: string;
-    delegated_from?: string;
-  };
-  policy?: {
-    capabilities: string[];
-  };
-  
-  [key: string]: any;
+    version: string;
+    agent_id?: string;
+    owner?: string;
+    public_key?: string;
+    keys?: KeyRecord[];
+    endpoint?: string;
+    capabilities?: string[];
+    issued_at?: string;
+    signature?: string;
+
+    // v2.0 decoupled fields
+    identity?: {
+        agent_id: string;
+        owner: string;
+        keys: KeyRecord[];
+        endpoint: string;
+        delegated_from?: string;
+    };
+    policy?: {
+        capabilities: string[];
+    };
+
+    [key: string]: any;
 }
 
 interface KeyRecord {
-  public_key: string;
-  status: "active" | "revoked";
-  expires_at?: string;
-  revoked_at?: string;
+    public_key: string;
+    status: "active" | "revoked";
+    expires_at?: string;
+    revoked_at?: string;
 }
 
 interface VerifyResult {
-  valid: boolean;
-  agent_id?: string;
-  reason?: string;
-  document?: AgentDocument;
+    valid: boolean;
+    agent_id?: string;
+    reason?: string;
+    document?: AgentDocument;
 }
 
 interface RegisterPayload {
-  agent_id: string;
-  domain: string;
-  agent_json_url: string;
-  metadata?: Record<string, string>;
+    agent_id: string;
+    domain: string;
+    agent_json_url: string;
+    metadata?: Record<string, string>;
 }
 
 interface ClientOptions {
-  baseUrl?: string;
-  headers?: Record<string, string>;
+    baseUrl?: string;
+    headers?: Record<string, string>;
 }
 
 interface RenewPayload {
-  agent_id: string;
-  new_expires_at: string;
-  signature: string;
+    agent_id: string;
+    new_expires_at: string;
+    signature: string;
 }
 
 interface RenewResult {
-  agent_id: string;
-  issuer: string;
-  level: "verified" | "trusted" | "unverified" | "revoked";
-  domain: string;
-  public_key: string;
-  registered_at: string;
-  issued_at: string;
-  expires_at: string;
+    agent_id: string;
+    issuer: string;
+    level: "verified" | "trusted" | "unverified" | "revoked";
+    domain: string;
+    public_key: string;
+    registered_at: string;
+    issued_at: string;
+    expires_at: string;
 }
 
 interface WebhookPayload {
-  agent_id: string;
-  webhook_url: string;
-  signature: string;
+    agent_id: string;
+    webhook_url: string;
+    signature: string;
 }
 
 interface WebhookResult {
-  agent_id: string;
-  webhook_url: string;
+    agent_id: string;
+    webhook_url: string;
 }
 
 interface DiscoveryResult {
-  target_agent_id: string;
-  endpoint?: string;
-  capabilities?: string[];
-  authenticated: boolean;
-  error?: string;
+    target_agent_id: string;
+    endpoint?: string;
+    capabilities?: string[];
+    authenticated: boolean;
+    error?: string;
 }
 ```
 
@@ -400,8 +403,8 @@ interface DiscoveryResult {
 
 ## Environment Variables
 
-| Variable | Default | Description |
-| :--- | :--- | :--- |
+| Variable                | Default                        | Description                                               |
+| :---------------------- | :----------------------------- | :-------------------------------------------------------- |
 | `CREDUENT_REGISTRY_URL` | `https://creduent.idevsec.com` | Override the registry used for `agent://` URI resolution. |
 
 ---
