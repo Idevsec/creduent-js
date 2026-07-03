@@ -42,7 +42,7 @@
         "typescript": "^5.3.3"
     },
     "dependencies": {
-        "@idevsec/creduent-cli": "^2.0.3",
+        "@idevsec/creduent-cli": "^2.0.6",
         "zod": "^3.22.4"
     },
     "repository": {
