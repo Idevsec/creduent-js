@@ -3,21 +3,25 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+
 ## [2.0.4] - 2026-07-04
 
 ### Fixed
+
 - **NPM Lockfile Registry Resolvers:** Replaced relative local directory links (`../../creduent-cli`) in `package-lock.json` with direct public registry pointers.
 - **Removed Self-Dependency:** Cleaned up `package.json` dependencies by removing the package's self-import entry (`@idevsec/creduent`) which was causing circular resolution conflicts.
 - **TypeScript 6 Compatibility:** Configured explicit `"types": ["node"]` compiler definitions in `tsconfig.json` to resolve Node.js glob import warnings.
 - **Workflow Build Steps:** Enabled `--legacy-peer-deps` to bypass strict local package locks in CI runners, and removed execution of the missing `npm run test` script.
 
 ### Added
+
 - **Community Standards & Styling:** Integrated `CODE_OF_CONDUCT.md`, `SECURITY.md`, `CONTRIBUTING.md`, `.editorconfig`, `.prettierrc`, and `.pre-commit-config.yaml`.
 - **CI Workflows:** Added automated Prettier styling checks and publication actions.
 
 ## [2.0.3] - 2026-06-29
 
 ### Changed
+
 - Maintenance update bump.
 
 ## [2.0.2] - 2026-06-27
