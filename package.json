@@ -39,7 +39,7 @@
     "license": "Apache-2.0",
     "devDependencies": {
         "@types/node": "^26.0.0",
-        "typescript": "^5.3.3"
+        "typescript": "^6.0.3"
     },
     "dependencies": {
         "@idevsec/creduent-cli": "^2.0.6",
