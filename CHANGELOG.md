@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - **Documentation & Tests:** Replaced the legacy test agent (`agent://creduent/reconbot`) with the official standard agent (`agent://idevsec/steward`) across all code snippets, examples, and CLI help text to ensure consistency with production environments.
-- **CLI References:** Purged internal testing stubs from CLI usage output. 
+- **CLI References:** Purged internal testing stubs from CLI usage output.
 
 ## [2.0.4] - 2026-07-04
 
