@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
+## [2.0.5] - 2026-07-05
+
+### Changed
+
+- **Documentation & Tests:** Replaced the legacy test agent (`agent://creduent/reconbot`) with the official standard agent (`agent://idevsec/steward`) across all code snippets, examples, and CLI help text to ensure consistency with production environments.
+- **CLI References:** Purged internal testing stubs from CLI usage output. 
+
 ## [2.0.4] - 2026-07-04
 
 ### Fixed

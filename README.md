@@ -7,6 +7,9 @@
 
 The official JavaScript/TypeScript SDK for the **[Creduent Protocol](https://idevsec.com/creduent)** — the open standard for cryptographic AI agent identity, Ed25519 signing, and attestation.
 
+### What is Creduent?
+**Creduent** is an open application-layer protocol for cryptographic identity and trust verification of autonomous AI agents. Originated and stewarded by IDevSec, it provides a vendor-neutral standard to definitively verify who controls an AI agent, its authenticity, and its capabilities using Ed25519 cryptography and DNS records.
+
 Performs fully **decentralized, local Ed25519 signature verification** using the Web Crypto API (`globalThis.crypto.subtle`). Zero runtime dependencies — works natively on Node.js 18+, Vercel Edge, Cloudflare Workers, Deno, and modern browsers.
 
 > **Protocol**: [idevsec.com/creduent](https://idevsec.com/creduent) | **Docs**: [idevsec.com/creduent/docs](https://idevsec.com/creduent/docs) | **Registry**: [creduent.idevsec.com](https://creduent.idevsec.com)
@@ -42,7 +45,7 @@ The primary use case — fetch an agent document and validate its Ed25519 signat
 ```typescript
 import { verify } from "@idevsec/creduent";
 
-const result = await verify("agent://creduent/reconbot");
+const result = await verify("agent://idevsec/steward");
 
 if (result.valid) {
     console.log("Agent ID:", result.agent_id);
@@ -75,7 +78,7 @@ Resolve an `agent://` URI, a domain, or a direct HTTPS URL to its `agent.json` d
 import { resolveTarget } from "@idevsec/creduent";
 
 // Resolves via registry: https://creduent.idevsec.com/attest/<uri>
-const doc = await resolveTarget("agent://creduent/reconbot");
+const doc = await resolveTarget("agent://idevsec/steward");
 
 // Resolves via .well-known: https://example.com/.well-known/agent.json
 const doc2 = await resolveTarget("example.com");
@@ -101,7 +104,7 @@ console.log("Registered:", record.agent_id);
 ```javascript
 const { verify } = require("@idevsec/creduent");
 
-verify("agent://creduent/reconbot")
+verify("agent://idevsec/steward")
     .then((result) => {
         console.log(result.valid);
     })

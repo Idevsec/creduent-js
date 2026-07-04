@@ -102,7 +102,7 @@ export async function resolveAgent(uri: string, options?: ClientOptions): Promis
     const baseUrl = options?.baseUrl?.replace(/\/$/, "") || DEFAULT_BASE_URL;
     const normalizedUri = normalizeAgentUri(uri);
 
-    // Construct the URL: e.g. https://creduent.idevsec.com/agent://creduent/reconbot
+    // Construct the URL: e.g. https://creduent.idevsec.com/agent://idevsec/steward
     const url = `${baseUrl}/${normalizedUri}`;
     return request<AgentRecord>(url, "GET", undefined, options);
 }
