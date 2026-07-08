@@ -25,6 +25,7 @@
         "build:esm": "tsc",
         "build:cjs": "tsc -p tsconfig.cjs.json",
         "build": "npm run build:esm && npm run build:cjs",
+        "test": "node --test test/test.mjs",
         "prepublishOnly": "npm run build"
     },
     "keywords": [
