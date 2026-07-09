@@ -9,7 +9,7 @@ The official JavaScript/TypeScript SDK for the **[Creduent Protocol](https://ide
 
 ### What is Creduent?
 
-**Creduent** is an open application-layer protocol for cryptographic identity and trust verification of autonomous AI agents. Originated and stewarded by IDevSec, it provides a vendor-neutral standard to definitively verify who controls an AI agent, its authenticity, and its capabilities using Ed25519 cryptography and DNS records.
+**Creduent** is an open application-layer protocol for cryptographic identity and trust verification of autonomous AI agents, originally created by Kashish Kanojia and stewarded by IDevSec. The official JavaScript/TypeScript SDK is developed and maintained by IDevSec.
 
 Performs fully **decentralized, local Ed25519 signature verification** using the Web Crypto API (`globalThis.crypto.subtle`). Zero runtime dependencies — works natively on Node.js 18+, Vercel Edge, Cloudflare Workers, Deno, and modern browsers.
 
