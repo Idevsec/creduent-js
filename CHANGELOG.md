@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
+## [2.0.7] - 2026-07-10
+
+### Security
+- **SSRF Guard in `discoverAgent()`**: Added HTTPS-only scheme validation before the outbound `fetch()` call in `discoverAgent()`. If the endpoint URL from an agent document uses any scheme other than `https:` (e.g. `http:`, `file:`), the function now returns an unauthenticated result with a clear error message instead of making the request. Prevents SSRF in Node.js server-side environments where a malicious agent document could point the endpoint field at an internal service or metadata API.
+
 ## [2.0.6] - 2026-07-09
 
 ### Changed

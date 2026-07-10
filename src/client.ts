@@ -254,6 +254,31 @@ export async function discoverAgent(
     }
 
     const discoverUrl = endpoint.replace(/\/$/, "") + "/discover";
+
+    // Validate that the endpoint uses HTTPS before making the outbound request.
+    // This prevents SSRF in Node.js environments where a malicious agent document
+    // could point endpoint at an internal service (e.g. http://169.254.169.254/).
+    try {
+        const parsedEndpoint = new URL(endpoint);
+        if (parsedEndpoint.protocol !== "https:") {
+            return {
+                target_agent_id: doc.agent_id || targetNormalized,
+                endpoint,
+                capabilities: publicCaps,
+                authenticated: false,
+                error: "Authenticated discovery rejected: agent endpoint must use HTTPS.",
+            };
+        }
+    } catch {
+        return {
+            target_agent_id: doc.agent_id || targetNormalized,
+            endpoint,
+            capabilities: publicCaps,
+            authenticated: false,
+            error: "Authenticated discovery rejected: agent endpoint is not a valid URL.",
+        };
+    }
+
     try {
         const res = await fetch(discoverUrl, {
             method: "POST",

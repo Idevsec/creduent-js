@@ -89,5 +89,7 @@ Thumbs.db
 # Claude / Agent rules
 CLAUDE.md
 AGENTS.md
-
-
+# Test build outputs and locally generated agent files
+dist-test/
+agent.json
+private_key.pem

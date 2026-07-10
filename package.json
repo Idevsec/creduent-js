@@ -1,8 +1,8 @@
 {
     "name": "@idevsec/creduent",
-    "version": "2.0.6",
+    "version": "2.0.7",
     "type": "module",
-    "description": "Creduent is the open application-layer protocol for cryptographic identity and trust verification of autonomous AI agents using Ed25519 and DNS.",
+    "description": "The official JS/TS SDK for Creduent: the open standard and security protocol for cryptographic AI agent identity, authentication, and trust verification using Ed25519 and DNS.",
     "main": "./dist/cjs/index.js",
     "module": "./dist/esm/index.js",
     "types": "./dist/esm/index.d.ts",
@@ -30,11 +30,21 @@
     },
     "keywords": [
         "creduent",
-        "AI agent identity",
-        "cryptographic trust",
-        "agent.json",
-        "Ed25519",
-        "attestation registry",
+        "ai-agent",
+        "agent-identity",
+        "agent-trust",
+        "agent-verification",
+        "agent-security",
+        "agent-auth",
+        "autonomous-agents",
+        "cryptographic-signing",
+        "ed25519",
+        "attestation-registry",
+        "dns-verification",
+        "mcp",
+        "model-context-protocol",
+        "crewai",
+        "langgraph",
         "idevsec"
     ],
     "author": "IDevSec",
@@ -44,7 +54,6 @@
         "typescript": "^6.0.3"
     },
     "dependencies": {
-        "@idevsec/creduent-cli": "^2.0.6",
         "zod": "^4.4.3"
     },
     "repository": {

@@ -5,13 +5,13 @@
 [![Node Compatibility](https://img.shields.io/node/v/@idevsec/creduent.svg)](https://nodejs.org/)
 [![Downloads](https://img.shields.io/npm/dm/@idevsec/creduent.svg)](https://www.npmjs.com/package/@idevsec/creduent)
 
-The official JavaScript/TypeScript SDK for the **[Creduent Protocol](https://idevsec.com/creduent)** — the open standard for cryptographic AI agent identity, Ed25519 signing, and attestation.
+The official JavaScript/TypeScript SDK for the **[Creduent Protocol](https://idevsec.com/creduent)**, the open standard for cryptographic AI agent identity, Ed25519 signing, and attestation.
 
 ### What is Creduent?
 
 **Creduent** is an open application-layer protocol for cryptographic identity and trust verification of autonomous AI agents, originally created by Kashish Kanojia and stewarded by IDevSec. The official JavaScript/TypeScript SDK is developed and maintained by IDevSec.
 
-Performs fully **decentralized, local Ed25519 signature verification** using the Web Crypto API (`globalThis.crypto.subtle`). Zero runtime dependencies — works natively on Node.js 18+, Vercel Edge, Cloudflare Workers, Deno, and modern browsers.
+Performs fully **decentralized, local Ed25519 signature verification** using the Web Crypto API (`globalThis.crypto.subtle`). Zero runtime dependencies, as it works natively on Node.js 18+, Vercel Edge, Cloudflare Workers, Deno, and modern browsers.
 
 > **Protocol**: [idevsec.com/creduent](https://idevsec.com/creduent) | **Docs**: [idevsec.com/creduent/docs](https://idevsec.com/creduent/docs) | **Registry**: [creduent.idevsec.com](https://creduent.idevsec.com)
 
@@ -20,9 +20,9 @@ Performs fully **decentralized, local Ed25519 signature verification** using the
 ## Key Features
 
 - **Zero Runtime Dependencies**: No third-party cryptography libraries. Uses only the built-in Web Crypto API.
-- **Edge-Compatible**: Runs anywhere `globalThis.crypto.subtle` is available — Vercel Edge, Cloudflare Workers, Deno, Node.js 18+.
+- **Edge-Compatible**: Runs anywhere `globalThis.crypto.subtle` is available, including Vercel Edge, Cloudflare Workers, Deno, and Node.js 18+.
 - **Decentralized Verification**: Validates Ed25519 signatures locally. No registry trust required for `verify()`.
-- **RFC 8785 JCS Canonicalization**: Native TypeScript implementation — deterministic JSON serialization before signing.
+- **RFC 8785 JCS Canonicalization**: Native TypeScript implementation for deterministic JSON serialization before signing.
 - **Dual CJS & ESM Support**: Ships with full ESM and CommonJS exports alongside built-in TypeScript declarations.
 - **Registry Operations**: Built-in support for webhook management, attestation renewals, and authenticated capability discovery.
 - **Agent Framework Integrations**: First-class adapters for Vercel AI SDK and LangGraph JS.
@@ -41,7 +41,7 @@ npm install @idevsec/creduent
 
 ### Verify an Agent (Decentralized)
 
-The primary use case — fetch an agent document and validate its Ed25519 signature locally:
+The primary use case is to fetch an agent document and validate its Ed25519 signature locally:
 
 ```typescript
 import { verify } from "@idevsec/creduent";
@@ -157,10 +157,10 @@ const workflow = new StateGraph<State>({
 
 `verify()` performs a 4-step cryptographic check locally:
 
-1. **Resolve** — Fetches the `agent.json` document from the registry or `.well-known` endpoint.
-2. **Schema check** — Validates required fields (`version`, `agent_id`, `capabilities`, `signature`).
-3. **Canonicalize** — Removes the `signature` field and applies RFC 8785 JCS serialization.
-4. **Verify** — Validates the Ed25519 signature against all declared active public keys using `globalThis.crypto.subtle`.
+1. **Resolve**: Fetches the `agent.json` document from the registry or `.well-known` endpoint.
+2. **Schema check**: Validates required fields (`version`, `agent_id`, `capabilities`, `signature`).
+3. **Canonicalize**: Removes the `signature` field and applies RFC 8785 JCS serialization.
+4. **Verify**: Validates the Ed25519 signature against all declared active public keys using `globalThis.crypto.subtle`.
 
 If any active key produces a valid signature, the result is `valid: true`. The registry does not need to be live for step 4 to succeed.
 
@@ -266,6 +266,8 @@ Performs authenticated capability discovery by querying the target agent's `/dis
     - `privateKeyPem` (`string`, optional): Your private key PEM.
     - `options` (`ClientOptions`, optional)
 - **Returns**: `Promise<DiscoveryResult>`
+
+> **Security**: Authenticated discovery only contacts endpoints using `https:`. If the agent document's endpoint field uses any other scheme, the function returns `authenticated: false` with an error instead of making the request. This prevents SSRF in Node.js server-side deployments.
 
 ---
 
