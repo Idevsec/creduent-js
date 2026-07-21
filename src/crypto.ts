@@ -46,3 +46,47 @@ export async function verifySignature(publicKeyStr: string, signatureB64: string
         return false;
     }
 }
+
+/**
+ * Verifies an HMAC-SHA256 signature for a webhook payload.
+ * Compatible with Node.js 18+, Vercel Edge, Cloudflare Workers, and Deno.
+ *
+ * @param secret - The webhook pre-shared secret key (starts with `whsec_`)
+ * @param signatureHex - The hex-encoded signature from X-Creduent-Signature256 header
+ * @param timestamp - The timestamp from X-Creduent-Timestamp header
+ * @param payload - The webhook payload object (prior to JCS serialization)
+ */
+export async function verifyWebhookSignature(
+    secret: string,
+    signatureHex: string,
+    timestamp: string,
+    payload: unknown
+): Promise<boolean> {
+    try {
+        const canonical = canonicalize(payload);
+        const signedData = timestamp + "." + canonical;
+        const encoder = new TextEncoder();
+        const dataBytes = encoder.encode(signedData);
+        const secretBytes = encoder.encode(secret);
+
+        // Import HMAC key
+        const key = await globalThis.crypto.subtle.importKey(
+            "raw",
+            secretBytes,
+            { name: "HMAC", hash: { name: "SHA-256" } },
+            false,
+            ["verify"]
+        );
+
+        // Convert signature from hex string to bytes
+        const signatureBytes = new Uint8Array(
+            signatureHex.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16))
+        );
+
+        // Verify the signature
+        return await globalThis.crypto.subtle.verify("HMAC", key, signatureBytes, dataBytes);
+    } catch {
+        return false;
+    }
+}
+

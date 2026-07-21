@@ -420,7 +420,7 @@ interface DiscoveryResult {
 - **Protocol overview**: [idevsec.com/creduent](https://idevsec.com/creduent)
 - **Technical reference**: [idevsec.com/creduent/docs](https://idevsec.com/creduent/docs)
 - **CLI**: [github.com/idevsec/creduent-cli](https://github.com/idevsec/creduent-cli)
-- **Standards documents**: [github.com/idevsec/creduent](https://github.com/idevsec/creduent) (CREDUENT-001 through CREDUENT-006)
+- **Standards documents**: [github.com/idevsec/creduent](https://github.com/idevsec/creduent) (CREDUENT-001 through CREDUENT-007)
 
 ---
 

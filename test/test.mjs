@@ -6,7 +6,7 @@
 
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { generateKeyPairSync, sign, createPrivateKey } from "node:crypto";
+import { generateKeyPairSync, sign, createPrivateKey, createHmac } from "node:crypto";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Helpers — Ed25519 keygen + sign (Node.js native)
@@ -33,7 +33,7 @@ function signData(privateKey, data) {
 // ──────────────────────────────────────────────────────────────────────────────
 
 const { canonicalize } = await import("../dist/esm/crypto.js");
-const { verifySignature } = await import("../dist/esm/crypto.js");
+const { verifySignature, verifyWebhookSignature } = await import("../dist/esm/crypto.js");
 const { verify } = await import("../dist/esm/verify.js");
 const { verifyAgent, resolveAgent } = await import("../dist/esm/client.js");
 
@@ -373,3 +373,60 @@ describe("resolveAgent / verifyAgent (mocked fetch)", () => {
         assert.equal(result, false);
     });
 });
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 5. verifyWebhookSignature (HMAC-SHA256 Webhook Verification)
+// ──────────────────────────────────────────────────────────────────────────────
+
+describe("verifyWebhookSignature", () => {
+    test("valid HMAC signature returns true", async () => {
+        const secret = "whsec_test_secret_key_123456";
+        const timestamp = "1784594000";
+        const payload = {
+            event: "agent.expiry_warning",
+            agent_id: "agent://test/agent",
+            days_remaining: 28,
+        };
+
+        const canonical = canonicalize(payload);
+        const sigData = timestamp + "." + canonical;
+        const expectedSig = createHmac("sha256", secret).update(sigData).digest("hex");
+
+        const result = await verifyWebhookSignature(secret, expectedSig, timestamp, payload);
+        assert.equal(result, true);
+    });
+
+    test("invalid signature returns false", async () => {
+        const secret = "whsec_test_secret_key_123456";
+        const timestamp = "1784594000";
+        const payload = {
+            event: "agent.expiry_warning",
+            agent_id: "agent://test/agent",
+        };
+
+        const result = await verifyWebhookSignature(secret, "bad_sig_hex", timestamp, payload);
+        assert.equal(result, false);
+    });
+
+    test("tampered payload returns false", async () => {
+        const secret = "whsec_test_secret_key_123456";
+        const timestamp = "1784594000";
+        const payload = {
+            event: "agent.expiry_warning",
+            agent_id: "agent://test/agent",
+        };
+
+        const canonical = canonicalize(payload);
+        const sigData = timestamp + "." + canonical;
+        const expectedSig = createHmac("sha256", secret).update(sigData).digest("hex");
+
+        const tamperedPayload = {
+            event: "agent.expiry_warning",
+            agent_id: "agent://test/attacker",
+        };
+
+        const result = await verifyWebhookSignature(secret, expectedSig, timestamp, tamperedPayload);
+        assert.equal(result, false);
+    });
+});
+

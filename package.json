@@ -1,6 +1,6 @@
 {
     "name": "@idevsec/creduent",
-    "version": "2.0.7",
+    "version": "2.0.8",
     "type": "module",
     "description": "The official JS/TS SDK for Creduent: the open standard and security protocol for cryptographic AI agent identity, authentication, and trust verification using Ed25519 and DNS.",
     "main": "./dist/cjs/index.js",
