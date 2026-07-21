@@ -51,7 +51,7 @@
     "license": "Apache-2.0",
     "devDependencies": {
         "@types/node": "^26.0.0",
-        "typescript": "^6.0.3"
+        "typescript": "^7.0.2"
     },
     "dependencies": {
         "zod": "^4.4.3"
