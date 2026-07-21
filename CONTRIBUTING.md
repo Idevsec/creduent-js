@@ -95,3 +95,19 @@ Allowed types include:
 - `fix`: A bug fix in the reference implementation or schema.
 - `docs`: Documentation updates.
 - `refactor`: Code changes that do not alter behavior.
+
+---
+
+## Project Roadmap & Wanted Features
+
+The Creduent JS/TS SDK follows the global [Creduent Protocol Roadmap](https://github.com/idevsec/creduent/blob/main/ROADMAP.md). If you are looking for specific ways to contribute to the JS/TS ecosystem, please refer to our active hotspots below:
+
+### JS/TS SDK Active Hotspots
+* **Framework Integrations (Phase 4):** Implement native verification helper middlewares or tool-wrappers for:
+  * **LangChain JS** (similar to our Python integration adapters).
+  * **LlamaIndex TS** (zero-dependency integration classes).
+* **Local Cache Tuning (Phase 4):** Build a configurable, in-memory LRU cache wrapper for verification checks (with a 5-minute default TTL) inside `src/verifier.ts` to reduce duplicate registry API fetches.
+* **Delegation (CREDUENT-007 / Phase 5):** Assist in building the recursive chain validator `verifyDelegationChain()` to verify parent-child authorization tokens locally.
+
+Before opening a Pull Request for a new feature, please open an Issue to align on the specification and design.
+
