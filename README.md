@@ -25,7 +25,7 @@ Performs fully **decentralized, local Ed25519 signature verification** using the
 - **RFC 8785 JCS Canonicalization**: Native TypeScript implementation for deterministic JSON serialization before signing.
 - **Dual CJS & ESM Support**: Ships with full ESM and CommonJS exports alongside built-in TypeScript declarations.
 - **Registry Operations**: Built-in support for webhook management, attestation renewals, and authenticated capability discovery.
-- **Agent Framework Integrations**: First-class adapters for Vercel AI SDK and LangGraph JS.
+- **Agent Framework Integrations**: First-class adapters for Vercel AI SDK, LangGraph JS, LangChain JS, and LlamaIndex TS.
 
 ---
 
@@ -148,7 +148,24 @@ const workflow = new StateGraph<State>({
         verificationResult: null,
     },
 }).addNode("verify", (state) => verifyAgentNode(state, { strict: true }));
-// Add other nodes and compile...
+```
+
+#### LangChain JS
+
+```typescript
+import { verifyCreduentAgent } from "@idevsec/creduent";
+
+const result = await verifyCreduentAgent("agent://idevsec/steward", { strict: true });
+console.log("Verified:", result.verified);
+```
+
+#### LlamaIndex TS
+
+```typescript
+import { verifyLlamaIndexAgent } from "@idevsec/creduent";
+
+const result = await verifyLlamaIndexAgent("agent://idevsec/steward");
+console.log("LlamaIndex Verified:", result.verified);
 ```
 
 ---

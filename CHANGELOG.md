@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
+## [2.1.0] - 2026-07-31
+
+### Added
+- **Framework Integrations**: Added native JS/TS Creduent verification adapters for **LangChain JS/TS** (`verifyCreduentAgent` in `src/integrations/langchain.ts`) and **LlamaIndex TS** (`verifyLlamaIndexAgent` in `src/integrations/llamaindex.ts`).
+- **Complete Framework Ecosystem**: Expanded JS/TS framework adapters to cover Vercel AI SDK, LangGraph JS, LangChain JS, and LlamaIndex TS.
+
 ## [2.0.8] - 2026-07-21
 
 ### Added
