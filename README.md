@@ -25,6 +25,8 @@ Performs fully **decentralized, local Ed25519 signature verification** using the
 - **RFC 8785 JCS Canonicalization**: Native TypeScript implementation for deterministic JSON serialization before signing.
 - **Dual CJS & ESM Support**: Ships with full ESM and CommonJS exports alongside built-in TypeScript declarations.
 - **Registry Operations**: Built-in support for webhook management, attestation renewals, and authenticated capability discovery.
+- **Provenance & Reversibility Guard**: Fail-closed `ProvenanceGuard` ensuring un-bound tool self-assertions resolve to `IRREVERSIBLE` (OWASP AISVS v1.0 C9.2.3 canonicalization).
+- **Ledger Chain Verification**: Independent `LedgerChainVerifier` querying `/ledger/chain/{chainId}` to prevent self-referential payload truncation during reduction.
 - **Agent Framework Integrations**: First-class adapters for Vercel AI SDK, LangGraph JS, LangChain JS, and LlamaIndex TS.
 
 ---
