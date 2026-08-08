@@ -3,10 +3,42 @@ import { canonicalize, verifySignature } from "./crypto.js";
 
 const DEFAULT_REGISTRY_URL = "https://creduent.idevsec.com";
 
+interface CacheEntry {
+    doc: AgentDocument;
+    expiry: number;
+}
+
+const VERIFICATION_CACHE_TTL_MS = 300_000; // 5 minutes
+const verificationCache = new Map<string, CacheEntry>();
+
+/**
+ * Flushes all entries from the local verification LRU cache.
+ */
+export function clearVerificationCache(): void {
+    verificationCache.clear();
+}
+
+/**
+ * Evicts a specific agent's document from the local LRU cache.
+ */
+export function invalidateAgentCache(target: string): void {
+    verificationCache.delete(target);
+}
+
 /**
  * Resolves an agent:// URI, http(s) URL, or domain to a well-known agent.json
  */
-export async function resolveTarget(target: string): Promise<AgentDocument> {
+export async function resolveTarget(target: string, useCache: boolean = true): Promise<AgentDocument> {
+    if (useCache) {
+        const cached = verificationCache.get(target);
+        if (cached && Date.now() < cached.expiry) {
+            return cached.doc;
+        }
+        if (cached) {
+            verificationCache.delete(target);
+        }
+    }
+
     let url = target;
 
     if (target.startsWith("agent://")) {
@@ -26,7 +58,11 @@ export async function resolveTarget(target: string): Promise<AgentDocument> {
 
                     const finalRes = await fetch(url);
                     if (finalRes.ok) {
-                        return (await finalRes.json()) as AgentDocument;
+                        const doc = (await finalRes.json()) as AgentDocument;
+                        if (useCache) {
+                            verificationCache.set(target, { doc, expiry: Date.now() + VERIFICATION_CACHE_TTL_MS });
+                        }
+                        return doc;
                     }
                 }
             }
@@ -46,7 +82,14 @@ export async function resolveTarget(target: string): Promise<AgentDocument> {
         throw new Error(`Failed to fetch agent.json: ${res.statusText}`);
     }
 
-    return (await res.json()) as AgentDocument;
+    const doc = (await res.json()) as AgentDocument;
+    if (useCache) {
+        const cc = res.headers ? res.headers.get("Cache-Control") || "" : "";
+        if (!cc.includes("no-cache") && !cc.includes("no-store")) {
+            verificationCache.set(target, { doc, expiry: Date.now() + VERIFICATION_CACHE_TTL_MS });
+        }
+    }
+    return doc;
 }
 
 /**
@@ -54,19 +97,21 @@ export async function resolveTarget(target: string): Promise<AgentDocument> {
  * Performs fully local verification — no registry trust required for signature check.
  *
  * @param target - An agent:// URI, domain, HTTPS URL, or a pre-fetched AgentDocument
+ * @param useCache - Whether to check or update local 5-min LRU cache. Default is true.
  */
-export async function verify(target: string | AgentDocument): Promise<VerifyResult> {
+export async function verify(target: string | AgentDocument, useCache: boolean = true): Promise<VerifyResult> {
     let doc: AgentDocument;
 
     try {
         if (typeof target === "string") {
-            doc = await resolveTarget(target);
+            doc = await resolveTarget(target, useCache);
         } else {
             doc = target;
         }
     } catch (error: any) {
         return { valid: false, reason: error.message || "Resolution failed" };
     }
+
 
     if (doc.version === "2.0") {
         if (!doc.identity || !doc.policy) {
