@@ -28,6 +28,7 @@ Performs fully **decentralized, local Ed25519 signature verification** using the
 - **Provenance & Reversibility Guard**: Fail-closed `ProvenanceGuard` ensuring un-bound tool self-assertions resolve to `IRREVERSIBLE` (OWASP AISVS v1.0 C9.2.3 canonicalization).
 - **Ledger Chain Verification**: Independent `LedgerChainVerifier` querying `/ledger/chain/{chainId}` to prevent self-referential payload truncation during reduction.
 - **Agent Framework Integrations**: First-class adapters for Vercel AI SDK, LangGraph JS, LangChain JS, and LlamaIndex TS.
+- **Identity-Based Rate Limiting (IBRL)**: Express and Hono middleware for identity throttling (`IdentityRateLimiter`) per cryptographically verified `agent_id`.
 
 ---
 
@@ -275,6 +276,20 @@ Retrieves the currently registered webhook URL for the specified agent.
 
 ---
 
+### `createExpressIBRLMiddleware(limiter?)`
+
+Creates Express middleware for Identity-Based Rate Limiting (IBRL).
+
+```typescript
+import express from "express";
+import { createExpressIBRLMiddleware } from "@idevsec/creduent";
+
+const app = express();
+app.use(createExpressIBRLMiddleware());
+```
+
+---
+
 ### `discoverAgent(targetUri, myAgentId, privateKeyPem, options)`
 
 Performs authenticated capability discovery by querying the target agent's `/discover` endpoint with challenge-response validation.
@@ -471,7 +486,7 @@ interface DiscoveryResult {
 - **Protocol overview**: [idevsec.com/creduent](https://idevsec.com/creduent)
 - **Technical reference**: [idevsec.com/creduent/docs](https://idevsec.com/creduent/docs)
 - **CLI**: [github.com/idevsec/creduent-cli](https://github.com/idevsec/creduent-cli)
-- **Standards documents**: [github.com/idevsec/creduent](https://github.com/idevsec/creduent) (CREDUENT-001 through CREDUENT-007)
+- **Standards documents**: [github.com/idevsec/creduent](https://github.com/idevsec/creduent) (CREDUENT-001 through CREDUENT-008)
 
 ---
 

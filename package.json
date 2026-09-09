@@ -1,6 +1,6 @@
 {
     "name": "@idevsec/creduent",
-    "version": "2.1.0",
+    "version": "2.1.2",
     "type": "module",
     "description": "The official JS/TS SDK for Creduent: the open standard and security protocol for cryptographic AI agent identity, authentication, and trust verification using Ed25519 and DNS.",
     "main": "./dist/cjs/index.js",
@@ -25,7 +25,7 @@
         "build:esm": "tsc",
         "build:cjs": "tsc -p tsconfig.cjs.json",
         "build": "npm run build:esm && npm run build:cjs",
-        "test": "node --test test/test.mjs",
+        "test": "node --test test/test.mjs test/ibrl.test.mjs",
         "prepublishOnly": "npm run build"
     },
     "keywords": [
