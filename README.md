@@ -332,6 +332,38 @@ const valid = await verifySignature(
 
 ---
 
+### `agentToDid(agentUri, scheme?)`
+
+Converts an `agent://` URI into a standard Decentralized Identifier string (`did:creduent` or `did:web`).
+
+- **Parameters**:
+    - `agentUri` (`string`): The canonical `agent://` URI.
+    - `scheme` (`"creduent" | "web"`, optional): Target DID scheme. Defaults to `"creduent"`.
+- **Returns**: `string`
+
+---
+
+### `didToAgent(didUri)`
+
+Converts a `did:creduent` or `did:web` identifier string back to an `agent://` URI.
+
+- **Parameters**:
+    - `didUri` (`string`): The DID identifier.
+- **Returns**: `string`
+
+---
+
+### `agentToDidDocument(doc, scheme?)`
+
+Generates a standard W3C DID Document (JSON-LD compliant) from an `AgentDocument`.
+
+- **Parameters**:
+    - `doc` (`AgentDocument`): The agent document object.
+    - `scheme` (`"creduent" | "web"`, optional): Target DID scheme. Defaults to `"creduent"`.
+- **Returns**: `any` (W3C DID Document object)
+
+---
+
 ## Types
 
 ```typescript
