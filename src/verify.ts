@@ -172,8 +172,11 @@ export async function verify(target: string | AgentDocument, useCache: boolean =
         }
     }
 
-    const owner = doc.version === "2.0" ? doc.identity?.owner : doc.owner;
-    if (!owner || typeof owner !== "string" || (!owner.startsWith("mailto:") && !owner.startsWith("https://"))) {
+    const owner = (doc.identity && doc.identity.owner) ? doc.identity.owner : doc.owner;
+    if (!owner || typeof owner !== "string") {
+        return { valid: false, reason: "Missing or empty owner field in agent.json", document: doc };
+    }
+    if (!owner.startsWith("mailto:") && !owner.startsWith("https://")) {
         return { valid: false, reason: `Invalid owner scheme: '${owner}'. Owner must start with 'mailto:' or 'https://'`, document: doc };
     }
 
