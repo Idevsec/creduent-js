@@ -26,9 +26,41 @@ export function invalidateAgentCache(target: string): void {
 }
 
 /**
+ * Queries DNS-over-HTTPS (DoH) via Cloudflare to verify if DNSSEC AD flag is true for a domain.
+ */
+export async function verifyDnssec(domain: string): Promise<boolean> {
+    if (!domain || domain.includes("localhost") || domain.includes("127.0.0.1")) {
+        return false;
+    }
+    try {
+        let host = domain;
+        if (domain.includes("://")) {
+            host = new URL(domain).hostname;
+        } else {
+            host = domain.split("/")[0].split(":")[0];
+        }
+        if (!host) return false;
+
+        const dohUrl = `https://1.1.1.1/dns-query?name=${encodeURIComponent(host)}&type=A`;
+        const res = await fetch(dohUrl, { headers: { Accept: "application/dns-json" } });
+        if (res.ok) {
+            const data = (await res.json()) as { AD?: boolean };
+            return Boolean(data.AD);
+        }
+    } catch (e) {
+        // Fallback
+    }
+    return false;
+}
+
+/**
  * Resolves an agent:// URI, http(s) URL, or domain to a well-known agent.json
  */
 export async function resolveTarget(target: string, useCache: boolean = true): Promise<AgentDocument> {
+    if (target.includes("../") || target.includes("..\\") || target.includes("/./") || target.includes("\\.\\")) {
+        throw new Error("Path traversal or relative path sequence detected in target URI.");
+    }
+
     if (useCache) {
         const cached = verificationCache.get(target);
         if (cached && Date.now() < cached.expiry) {
@@ -86,7 +118,15 @@ export async function resolveTarget(target: string, useCache: boolean = true): P
     if (useCache) {
         const cc = res.headers ? res.headers.get("Cache-Control") || "" : "";
         if (!cc.includes("no-cache") && !cc.includes("no-store")) {
-            verificationCache.set(target, { doc, expiry: Date.now() + VERIFICATION_CACHE_TTL_MS });
+            let ttlMs = VERIFICATION_CACHE_TTL_MS;
+            const match = cc.match(/max-age=(\d+)/i);
+            if (match) {
+                const parsedSec = parseInt(match[1], 10);
+                if (!isNaN(parsedSec)) {
+                    ttlMs = Math.max(60, Math.min(86400, parsedSec)) * 1000;
+                }
+            }
+            verificationCache.set(target, { doc, expiry: Date.now() + ttlMs });
         }
     }
     return doc;
@@ -132,6 +172,11 @@ export async function verify(target: string | AgentDocument, useCache: boolean =
         }
     }
 
+    const owner = doc.version === "2.0" ? doc.identity?.owner : doc.owner;
+    if (!owner || typeof owner !== "string" || (!owner.startsWith("mailto:") && !owner.startsWith("https://"))) {
+        return { valid: false, reason: `Invalid owner scheme: '${owner}'. Owner must start with 'mailto:' or 'https://'`, document: doc };
+    }
+
     const signature = doc.signature;
     if (!signature) {
         return { valid: false, reason: "No signature present", document: doc };
@@ -164,12 +209,16 @@ export async function verify(target: string | AgentDocument, useCache: boolean =
     delete payload.signature;
     const canonicalData = canonicalize(payload);
 
+    const targetDomain = (doc.version === "2.0" ? doc.identity?.endpoint : doc.endpoint) || (typeof target === "string" ? target : "");
+    const dnssecVerified = await verifyDnssec(targetDomain);
+
     for (const key of keys) {
         const isValid = await verifySignature(key, signature, canonicalData);
         if (isValid) {
             return {
                 valid: true,
                 agent_id: doc.version === "2.0" ? doc.identity?.agent_id : doc.agent_id,
+                dnssec_verified: dnssecVerified,
                 document: doc,
             };
         }

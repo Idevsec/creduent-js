@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
+## [2.2.0] - 2026-09-15
+
+### Added
+- **Path Traversal Guard**: Added path traversal validation in `src/verify.ts` (`resolveTarget`), rejecting relative directory escaping (`../`, `..\`).
+- **Owner Scheme Validation**: Hardened `verifyAgent` in `src/verify.ts` to strictly validate `identity.owner` against `mailto:` or `https://` schemes.
+- **DNSSEC Verification Helper**: Added `verifyDnssec()` helper function in `src/verify.ts` and added optional `dnssec_verified?: boolean` property to `VerifyResult` in `src/types.ts`.
+- **Dynamic Cache TTL Tuning**: Enhanced in-memory cache to parse `Cache-Control: max-age=...` headers from HTTP responses and adjust cache expiration dynamically.
+
 ## [2.1.2] - 2026-09-10
 
 ### Added

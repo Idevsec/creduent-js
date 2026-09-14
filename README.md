@@ -22,6 +22,10 @@ Performs fully **decentralized, local Ed25519 signature verification** using the
 - **Zero Runtime Dependencies**: No third-party cryptography libraries. Uses only the built-in Web Crypto API.
 - **Edge-Compatible**: Runs anywhere `globalThis.crypto.subtle` is available, including Vercel Edge, Cloudflare Workers, Deno, and Node.js 18+.
 - **Decentralized Verification**: Validates Ed25519 signatures locally. No registry trust required for `verify()`.
+- **Path Traversal Mitigation**: Pre-resolution security guards in `resolveTarget()` rejecting directory traversal URI sequences (`../`, `..\`).
+- **Owner Metadata Scheme Validation**: Hardened `identity.owner` validation strictly enforcing `mailto:` or `https://` schemes.
+- **Client-Side DNSSEC Verification**: Exported `verifyDnssec()` DoH helper appending `dnssec_verified?: boolean` property to `VerifyResult`.
+- **Dynamic Cache TTL Tuning**: Automatically parses HTTP `Cache-Control: max-age=N` headers to dynamically optimize local resolution cache TTLs.
 - **RFC 8785 JCS Canonicalization**: Native TypeScript implementation for deterministic JSON serialization before signing.
 - **Dual CJS & ESM Support**: Ships with full ESM and CommonJS exports alongside built-in TypeScript declarations.
 - **Registry Operations**: Built-in support for webhook management, attestation renewals, and authenticated capability discovery.

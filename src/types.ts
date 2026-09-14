@@ -44,6 +44,7 @@ export interface AgentDocument {
 export interface VerifyResult {
     valid: boolean;
     agent_id?: string;
+    dnssec_verified?: boolean;
     reason?: string;
     document?: AgentDocument;
 }

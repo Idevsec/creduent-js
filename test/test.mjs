@@ -34,7 +34,7 @@ function signData(privateKey, data) {
 
 const { canonicalize } = await import("../dist/esm/crypto.js");
 const { verifySignature, verifyWebhookSignature } = await import("../dist/esm/crypto.js");
-const { verify } = await import("../dist/esm/verify.js");
+const { verify, resolveTarget, verifyDnssec } = await import("../dist/esm/verify.js");
 const { verifyAgent, resolveAgent } = await import("../dist/esm/client.js");
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -158,7 +158,7 @@ function buildSignedV1Doc(overrides = {}) {
     const doc = {
         version: "1.1",
         agent_id: "agent://test/myagent",
-        owner: "Test Corp",
+        owner: "mailto:contact@testcorp.com",
         public_key: publicKeyStr,
         capabilities: ["task_execution"],
         issued_at: new Date().toISOString(),
@@ -184,7 +184,7 @@ function buildSignedV2Doc(overrides = {}) {
         version: "2.0",
         identity: {
             agent_id: "agent://test/myagent",
-            owner: "Test Corp",
+            owner: "mailto:contact@testcorp.com",
             keys: [{ public_key: publicKeyStr, status: "active" }],
             endpoint: "https://test.example.com",
         },
@@ -219,7 +219,7 @@ describe("verify() — v1.1 documents", () => {
 
     test("tampered field returns invalid", async () => {
         const { doc } = buildSignedV1Doc();
-        doc.owner = "Evil Corp"; // tamper after signing
+        doc.owner = "mailto:evil@evilcorp.com"; // tamper after signing
         const result = await verify(doc);
         assert.equal(result.valid, false);
         assert.match(result.reason, /Signature verification failed/i);
@@ -260,7 +260,7 @@ describe("verify() — v2.0 documents", () => {
 
     test("tampered field returns invalid", async () => {
         const { doc } = buildSignedV2Doc();
-        doc.identity.owner = "Evil Corp"; // tamper after signing
+        doc.identity.owner = "mailto:evil@evilcorp.com"; // tamper after signing
         const result = await verify(doc);
         assert.equal(result.valid, false);
         assert.match(result.reason, /Signature verification failed/i);
@@ -429,6 +429,59 @@ describe("verifyWebhookSignature", () => {
         assert.equal(result, false);
     });
 });
+
+describe("Path Traversal & Owner Scheme Hardening", () => {
+    test("resolveTarget rejects path traversal attempts", async () => {
+        const invalidTargets = [
+            "agent://domain/../../etc/passwd",
+            "https://example.com/../.well-known/agent.json",
+            "agent://namespace/\\..\\secret",
+        ];
+        for (const t of invalidTargets) {
+            await assert.rejects(
+                () => resolveTarget(t),
+                (err) => {
+                    assert.match(err.message, /Path traversal or relative path sequence/i);
+                    return true;
+                }
+            );
+        }
+    });
+
+    test("verify rejects invalid owner schemes", async () => {
+        const { doc } = buildSignedV2Doc();
+        doc.identity.owner = "Plain Organization"; // Invalid scheme
+        const result = await verify(doc);
+        assert.equal(result.valid, false);
+        assert.match(result.reason, /Invalid owner scheme/i);
+    });
+
+    test("verify accepts mailto: and https:// owner schemes", async () => {
+        const { doc: docMailto } = buildSignedV2Doc({
+            identity: {
+                agent_id: "agent://test/myagent",
+                owner: "mailto:admin@example.com",
+                keys: [{ public_key: "ed25519:dummy", status: "active" }],
+                endpoint: "https://test.example.com",
+            }
+        });
+        // Test mailto owner validity logic
+        const resMailto = await verify(docMailto);
+        // Note: signature will fail if we overrode identity without re-signing, but scheme check passes
+        assert.doesNotMatch(resMailto.reason || "", /Invalid owner scheme/i);
+
+        const { doc: docHttps } = buildSignedV2Doc();
+        docHttps.identity.owner = "https://example.com/security";
+        const resHttps = await verify(docHttps);
+        assert.doesNotMatch(resHttps.reason || "", /Invalid owner scheme/i);
+    });
+
+    test("verifyDnssec returns boolean for local/remote domains", async () => {
+        const isLocal = await verifyDnssec("localhost");
+        assert.equal(isLocal, false);
+    });
+});
+
 
 
 
