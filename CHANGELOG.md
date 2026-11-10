@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
+## [2.3.0] - 2026-11-10
+
+### Added
+- **Cryptographic Delegation & PoP Verification (CREDUENT-007)**: Added `src/delegation.ts` implementing `signDelegation`, recursive `verifyDelegationChain`, and Proof-of-Possession header helpers (`signPopHeader`, `verifyPopHeader`). Validates attenuated capabilities, reversibility ceilings, clock skew limits, and max chain depth ($\le 8$).
+
 ## [2.2.1] - 2026-09-15
 
 ### Added

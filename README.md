@@ -33,6 +33,7 @@ Performs fully **decentralized, local Ed25519 signature verification** using the
 - **Ledger Chain Verification**: Independent `LedgerChainVerifier` querying `/ledger/chain/{chainId}` to prevent self-referential payload truncation during reduction.
 - **Agent Framework Integrations**: First-class adapters for Vercel AI SDK, LangGraph JS, LangChain JS, and LlamaIndex TS.
 - **Identity-Based Rate Limiting (IBRL)**: Express and Hono middleware for identity throttling (`IdentityRateLimiter`) per cryptographically verified `agent_id`.
+- **Cryptographic Delegation & PoP Verification (CREDUENT-007)**: Issue attenuated Creduent Delegation Tokens (`signDelegation`), verify multi-hop delegation chains (`verifyDelegationChain`), and bind Proof-of-Possession (`signPopHeader`, `verifyPopHeader`) to neutralize token replay.
 
 ---
 
@@ -290,6 +291,52 @@ import { createExpressIBRLMiddleware } from "@idevsec/creduent";
 
 const app = express();
 app.use(createExpressIBRLMiddleware());
+```
+
+---
+
+### Delegation & Proof-of-Possession (CREDUENT-007)
+
+Issue attenuated Creduent Delegation Tokens (CDTs) and verify multi-hop delegation chains with Proof-of-Possession (PoP):
+
+```typescript
+import { signDelegation, verifyDelegationChain, signPopHeader } from "@idevsec/creduent";
+
+// 1. Delegator issues a CDT to a child agent
+const cdt = signDelegation({
+    delegatorPrivateKeyPem: parentPem,
+    delegatorUri: "agent://corp/orchestrator",
+    delegateUri: "agent://corp/child",
+    delegatePublicKey: "ed25519:<child_pubkey>",
+    constraints: {
+        allowed_capabilities: ["scan", "query"],
+        max_reversibility: "reversible",
+        allowed_tools: ["search_api"]
+    },
+    ttlSeconds: 1800,
+});
+
+// 2. Delegate creates short-lived Proof-of-Possession signature for downstream HTTP request
+const { popSignature, timestamp } = signPopHeader({
+    delegatePrivateKeyPem: childPem,
+    httpMethod: "POST",
+    uriPath: "/api/tools/search",
+    tokenId: cdt.token_id as string,
+});
+
+// 3. Gateway verifies delegation chain, constraint narrowing, and PoP key binding
+const result = await verifyDelegationChain({
+    cdtChain: [cdt],
+    targetAction: "search_api",
+    requiredCapability: "scan",
+    popSignature,
+    popTimestamp: timestamp,
+    httpMethod: "POST",
+    uriPath: "/api/tools/search",
+    trustedPublicKeys: { "agent://corp/orchestrator": "ed25519:<parent_pubkey>" },
+});
+
+console.log("Delegation verified:", result.valid);
 ```
 
 ---

@@ -24,4 +24,5 @@ export * from "./provenance.js";
 export * from "./ledger.js";
 export * from "./did.js";
 export * from "./ibrl.js";
+export * from "./delegation.js";
 
